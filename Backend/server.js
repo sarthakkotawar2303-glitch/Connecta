@@ -16,7 +16,7 @@ const User = require("./Src/Model/userModel");
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
 connectToDb();
 
@@ -29,12 +29,11 @@ app.use(errorHandler);
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: "http://localhost:5173", credentials: true },
+  cors: { origin: process.env.CLIENT_URL, credentials: true },
   pingTimeout: 60000,
 });
 
 io.on("connection", (socket) => {
-  console.log("Connected:", socket.id);
 
   socket.on("setup", async (userId) => {
     socket.join(userId);
@@ -66,7 +65,7 @@ io.on("connection", (socket) => {
       socket.to(userId).emit("notification received", messageData);
     });
 
-   
+
     socket.to(senderId).emit("message delivered", {
       messageId: messageData._id,
       chatId: chat._id,
@@ -86,16 +85,15 @@ io.on("connection", (socket) => {
     socket.to(chatId).emit("messages read", { chatId, userId });
   });
 
-socket.on("message deleted", ({ message, chatId }) => {
-  socket.to(chatId).emit("message deleted", message);
-});
+  socket.on("message deleted", ({ message, chatId }) => {
+    socket.to(chatId).emit("message deleted", message);
+  });
 
-socket.on("message edited", ({ message, chatId }) => {
-  socket.to(chatId).emit("message edited", message);
-});
+  socket.on("message edited", ({ message, chatId }) => {
+    socket.to(chatId).emit("message edited", message);
+  });
 
   socket.on("disconnect", async () => {
-    console.log("Disconnected:", socket.id);
     const userId = socket.data.userId;
     if (!userId) return;
     const lastSeen = new Date();

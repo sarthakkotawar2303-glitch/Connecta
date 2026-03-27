@@ -41,7 +41,7 @@ const Navbar = () => {
               <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767A4 4 0 0015 13h2a2 2 0 002-2V9a2 2 0 00-2-2h-2z" />
             </svg>
           </div>
-          <span className="text-white font-bold text-lg tracking-tight">Ping</span>
+          <span className="text-white font-bold text-lg tracking-tight">Connecta</span>
         </div>
         
 
