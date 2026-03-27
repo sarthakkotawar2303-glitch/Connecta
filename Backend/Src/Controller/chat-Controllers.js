@@ -1,5 +1,6 @@
 const Chat = require("../Model/chatModel");
 const User = require("../Model/userModel");
+const mongoose = require("mongoose");
 
 //AccessChats
 const accessChats = async (req, res) => {
@@ -46,7 +47,7 @@ const accessChats = async (req, res) => {
   }
 };
 
-// fetch all charts
+// fetch all chats
 const fetchChats = async (req, res) => {
   try {
     let chats = await Chat.find({
@@ -68,31 +69,24 @@ const fetchChats = async (req, res) => {
   }
 };
 
-//creating group chat
-const mongoose = require("mongoose");
-
 const createGroupChat = async (req, res) => {
   try {
     const { users, chatName } = req.body;
 
-    //Basic validation
     if (!users || !chatName) {
       return res.status(400).json({ message: "Please fill all fields" });
     }
 
-    // Ensure users is array
     if (!Array.isArray(users)) {
       return res.status(400).json({ message: "Users must be an array" });
     }
 
-    // Minimum 2 users check
     if (users.length < 2) {
       return res.status(400).json({
         message: "At least 2 users are required to form a group",
       });
     }
 
-    //Validate Mongo IDs
     const validUsers = users.filter((id) =>
       mongoose.Types.ObjectId.isValid(id)
     );
@@ -101,7 +95,6 @@ const createGroupChat = async (req, res) => {
       return res.status(400).json({ message: "Invalid user ID detected" });
     }
 
-    // Add logged in user safely & remove duplicates
     const allUsers = [...new Set([...validUsers, req.user.id])];
 
     const groupChat = await Chat.create({
@@ -122,10 +115,22 @@ const createGroupChat = async (req, res) => {
   }
 };
 
-//rnameing chat
+// renaming chat
 const renameGroup = async (req, res) => {
   try {
     const { chatId, chatName } = req.body;
+
+    const chat = await Chat.findById(chatId);
+
+    if (!chat) {
+      return res.status(404).json({ message: "Chat not found" });
+    }
+
+    if (chat.groupAdmin.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json({ message: "Only admin can perform this action" });
+    }
 
     const updatedChat = await Chat.findByIdAndUpdate(
       chatId,
@@ -135,61 +140,68 @@ const renameGroup = async (req, res) => {
       .populate("users", "-password")
       .populate("groupAdmin", "-password");
 
-    if (!updatedChat) {
-      return res.status(404).json({ message: "Chat not found" });
-    }
-
     res.json(updatedChat);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-//remove user
+// remove user
 const removeFromGroup = async (req, res) => {
   try {
     const { chatId, userId } = req.body;
 
+    const chat = await Chat.findById(chatId);
+
+    if (!chat) {
+      return res.status(404).json({ message: "Chat not found" });
+    }
+
+    if (chat.groupAdmin.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json({ message: "Only admin can perform this action" });
+    }
+
     const updatedChat = await Chat.findByIdAndUpdate(
       chatId,
-      {
-        $pull: { users: userId },
-      },
+      { $pull: { users: userId } },
       { new: true }
     )
       .populate("users", "-password")
       .populate("groupAdmin", "-password");
 
-    if (!updatedChat) {
-      return res.status(404).json({ message: "Chat not found" });
-    }
-
     res.json(updatedChat);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-//addToGroup
+// add to group
 const addToGroup = async (req, res) => {
   try {
     const { chatId, userId } = req.body;
 
+    const chat = await Chat.findById(chatId);
+
+    if (!chat) {
+      return res.status(404).json({ message: "Chat not found" });
+    }
+
+    if (chat.groupAdmin.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json({ message: "Only admin can perform this action" });
+    }
+
+    
     const added = await Chat.findByIdAndUpdate(
       chatId,
-      {
-        $push: { users: userId },
-      },
-      {
-        new: true,
-      }
+      { $addToSet: { users: userId } },
+      { new: true }
     )
       .populate("users", "-password")
       .populate("groupAdmin", "-password");
-
-    if (!added) {
-      return res.status(404).json({ message: "Chat Not Found" });
-    }
 
     res.json(added);
   } catch (error) {

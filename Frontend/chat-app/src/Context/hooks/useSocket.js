@@ -9,7 +9,7 @@ const useSocket = (user, selectedChatRef, setMessages, setChats, setUnreadCounts
   const [onlineUsers, setOnlineUsers] = useState({});
   const [deliveredMessages, setDeliveredMessages] = useState(new Set());
 
-  // ── connect socket when user logs in ──
+  //connect socket when user logs in
   useEffect(() => {
     if (!user?._id) return;
 
@@ -17,7 +17,7 @@ const useSocket = (user, selectedChatRef, setMessages, setChats, setUnreadCounts
     socketRef.current = socket;
 
     socket.emit("setup", user._id);
-    socket.on("connected", () => console.log("✅ Socket ready"));
+    socket.on("connected", () => console.log("Socket ready"));
 
     // ── new message received ──
     socket.on("message received", (newMessage) => {
@@ -44,7 +44,7 @@ const useSocket = (user, selectedChatRef, setMessages, setChats, setUnreadCounts
       );
     });
 
-    // ── typing indicators ──
+    // typing indicators
     socket.on("typing", ({ chatId, username }) => {
       if (selectedChatRef.current?._id === chatId) {
         setTypingInfo({ chatId, username });
@@ -54,7 +54,7 @@ const useSocket = (user, selectedChatRef, setMessages, setChats, setUnreadCounts
       if (selectedChatRef.current?._id === chatId) setTypingInfo(null);
     });
 
-    // ── online/offline status ──
+    // online/offline status
     socket.on("user online", ({ userId }) => {
       setOnlineUsers((prev) => ({ ...prev, [userId]: { isOnline: true, lastSeen: null } }));
     });
@@ -62,7 +62,7 @@ const useSocket = (user, selectedChatRef, setMessages, setChats, setUnreadCounts
       setOnlineUsers((prev) => ({ ...prev, [userId]: { isOnline: false, lastSeen } }));
     });
 
-    // ── messages read by other user ──
+    // messages read by other user
     socket.on("messages read", ({ chatId, userId }) => {
       setMessages((prev) =>
         prev.map((m) =>
@@ -73,7 +73,7 @@ const useSocket = (user, selectedChatRef, setMessages, setChats, setUnreadCounts
       );
     });
 
-    // ── message deleted broadcast ──
+    // message deleted broadcast 
     socket.on("message deleted", ({ message }) => {
       setMessages((prev) => prev.map((m) => m._id === message._id ? message : m));
       setChats((prev) =>

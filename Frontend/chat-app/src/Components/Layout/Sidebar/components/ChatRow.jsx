@@ -4,18 +4,7 @@ import { getChatName, getChatPic, getOtherUser, getLatestMsg, formatTime } from 
 const FALLBACK_AVATAR =
   "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg";
 
-// ─── ChatRow ──────────────────────────────────────────────
-// A single row in the chat list.
-// Renders avatar (with online/unread dot), name, timestamp,
-// message preview, unread badge, and read receipt ticks.
-//
-// Props:
-//   chat            – chat object
-//   isSelected      – bool (highlights row in teal)
-//   currentUserId   – logged-in user's _id
-//   unread          – unread count for this chat (0 if selected)
-//   onlineUsers     – { [userId]: { isOnline, lastSeen } }
-//   onClick         – called when the row is clicked
+
 
 const ChatRow = ({ chat, isSelected, currentUserId, unread, onlineUsers, onClick }) => {
   const pic = getChatPic(chat, currentUserId);
@@ -35,8 +24,8 @@ const ChatRow = ({ chat, isSelected, currentUserId, unread, onlineUsers, onClick
           : "hover:bg-slate-800/50"
       }`}
     >
-      {/* ── Avatar ── */}
-      <div className="relative flex-shrink-0">
+      
+      <div className="relative flex shrink-0">
         {chat.isGroupChat ? (
           <div className="w-11 h-11 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center">
             <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -51,20 +40,18 @@ const ChatRow = ({ chat, isSelected, currentUserId, unread, onlineUsers, onClick
           />
         )}
 
-        {/* Online dot (only when no unread) */}
+       
         {isOnline && !hasUnread && (
           <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-900 rounded-full" />
         )}
-        {/* Unread dot (takes priority over online dot) */}
+        
         {hasUnread && (
           <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-teal-500 border-2 border-slate-900 rounded-full" />
         )}
       </div>
 
-      {/* ── Text ── */}
       <div className="flex-1 min-w-0">
 
-        {/* Row 1: name + timestamp */}
         <div className="flex justify-between items-center gap-1">
           <p className={`text-sm truncate ${
             isSelected ? "text-teal-300 font-semibold"
@@ -78,7 +65,6 @@ const ChatRow = ({ chat, isSelected, currentUserId, unread, onlineUsers, onClick
           </span>
         </div>
 
-        {/* Row 2: message preview + badge/ticks */}
         <div className="flex items-center justify-between gap-1 mt-0.5">
           <p className={`text-xs truncate flex-1 min-w-0 ${
             hasUnread ? "text-slate-200 font-medium" : "text-slate-500"

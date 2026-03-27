@@ -1,13 +1,7 @@
 const FALLBACK_AVATAR =
   "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg";
 
-// ─── SearchResults ────────────────────────────────────────
-// Shown below the search bar when the user is typing.
-// Renders a list of matching users, or a "No users found" message.
-//
-// Props:
-//   results       – array of user objects from API
-//   onUserSelect  – called with a user object when a row is clicked
+
 
 const SearchResults = ({ results, onUserSelect }) => {
   if (!results?.length) {

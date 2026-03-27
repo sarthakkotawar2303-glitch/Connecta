@@ -12,12 +12,11 @@ const ChatContext = createContext();
 
 const ChatProvider = ({ children }) => {
 
-  // ── user state lives here — needed by all hooks ──
+
   const [user, setUser] = useState(() =>
     JSON.parse(localStorage.getItem("userInfo")) || null
   );
 
-  // ── track selected chat here — needed by socket + messages ──
   const selectedChatRef = useRef(null);
 
   // ── search ──
@@ -26,11 +25,9 @@ const ChatProvider = ({ children }) => {
   // ── chats ──
   const chats = useChats(user, setUser);
 
-  // ── messages (needs socketRef from socket hook — passed after) ──
   const socketRef = useRef(null);
   const messages = useMessages(user, socketRef);
 
-  // ── socket (needs setters from messages + chats) ──
   const socket = useSocket(
     user,
     selectedChatRef,
@@ -39,17 +36,14 @@ const ChatProvider = ({ children }) => {
     messages.setUnreadCounts,
   );
 
-  // ── keep socketRef in sync with socket hook's ref ──
   useEffect(() => {
     socketRef.current = socket.socketRef.current;
   });
 
-  // ── keep selectedChatRef in sync ──
   useEffect(() => {
     selectedChatRef.current = chats.selectedChat;
   }, [chats.selectedChat]);
 
-  // ── join/leave chat room when selected chat changes ──
   useEffect(() => {
     if (!chats.selectedChat?._id) {
       socket.setTypingInfo(null);
@@ -65,7 +59,6 @@ const ChatProvider = ({ children }) => {
     };
   }, [chats.selectedChat?._id]);
 
-  // ── fetch chats + unread counts on login ──
   useEffect(() => {
     if (user?.accessToken) {
       chats.fetchChats(socket.setOnlineUsers);
@@ -73,7 +66,6 @@ const ChatProvider = ({ children }) => {
     }
   }, [user]);
 
-  // ── wrap functions that need cross-hook data ──
   const sendMessage = (chatId, content) => {
     messages.sendMessage(chatId, content, chats.setChats);
   };

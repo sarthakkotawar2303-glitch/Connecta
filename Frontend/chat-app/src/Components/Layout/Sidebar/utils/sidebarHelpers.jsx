@@ -15,9 +15,7 @@ export const getChatName = (chat, currentUserId) => {
   return other?.username || "Unknown";
 };
 
-/**
- * Returns the avatar pic URL for a DM (null for group chats).
- */
+
 export const getChatPic = (chat, currentUserId) => {
   if (!chat || chat.isGroupChat) return null;
   const other = chat.users?.find(
@@ -26,9 +24,7 @@ export const getChatPic = (chat, currentUserId) => {
   return other?.pic || null;
 };
 
-/**
- * Returns the other participant object in a DM (null for group chats).
- */
+
 export const getOtherUser = (chat, currentUserId) => {
   if (!chat || chat.isGroupChat) return null;
   return chat.users?.find(
@@ -36,10 +32,7 @@ export const getOtherUser = (chat, currentUserId) => {
   ) || null;
 };
 
-/**
- * Builds the latest message preview string shown in each chat row.
- * e.g. "You: hey!" | "Ali: hey!" | "hey!"
- */
+
 export const getLatestMsg = (chat, currentUserId) => {
   const msg = chat.latestMessage;
   if (!msg?.content) return "No messages yet";
@@ -60,10 +53,7 @@ export const getLatestMsg = (chat, currentUserId) => {
   return isMe ? `You: ${msg.content}` : msg.content;
 };
 
-/**
- * Formats the latest message timestamp as a short relative string.
- * e.g. "10:30 AM" | "Yesterday" | "Mon"
- */
+
 export const formatTime = (chat) => {
   const ts = chat.latestMessage?.createdAt;
   if (!ts) return "";

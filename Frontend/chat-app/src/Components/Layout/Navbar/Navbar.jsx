@@ -3,12 +3,7 @@ import BellDropdown from "./components/BellDropdown";
 import ProfileDropdown from "./components/ProfileDropdown";
 import CreateGroupModal from "./components/CreateGroupModal";
 
-// ─── Navbar ───────────────────────────────────────────────
-// Pure layout shell. All logic lives in useNavbar().
-// To add a new feature:
-//   1. Add state/handler to useNavbar.js
-//   2. Create a component in components/
-//   3. Import both here and wire up
+
 
 const Navbar = () => {
   const {
@@ -36,9 +31,9 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="h-14 bg-slate-900 border-b border-slate-800 flex justify-between items-center px-5 flex-shrink-0">
+      <div className="h-20 bg-slate-900 border-b border-slate-800 flex justify-between items-center px-5 flex-shrink-0">
 
-        {/* ── Logo ── */}
+       
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center">
             <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -48,11 +43,10 @@ const Navbar = () => {
           </div>
           <span className="text-white font-bold text-lg tracking-tight">Ping</span>
         </div>
+        
 
-        {/* ── Right side actions ── */}
         <div className="flex items-center gap-3">
 
-          {/* Notification bell */}
           <BellDropdown
             bellRef={bellRef}
             bellOpen={bellOpen}
@@ -64,7 +58,6 @@ const Navbar = () => {
             onChatClick={handleBellChatClick}
           />
 
-          {/* New Group button */}
           <button
             onClick={() => setShowGroupModal(true)}
             className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-sm px-3 py-1.5 rounded-lg transition"
@@ -75,7 +68,6 @@ const Navbar = () => {
             New Group
           </button>
 
-          {/* Profile dropdown */}
           <ProfileDropdown
             dropdownRef={dropdownRef}
             profileOpen={profileOpen}
@@ -87,7 +79,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Group creation modal (rendered outside the navbar bar) */}
       {showGroupModal && (
         <CreateGroupModal
           groupName={groupName}

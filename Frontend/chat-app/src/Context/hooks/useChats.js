@@ -6,7 +6,7 @@ const useChats = (user, setUser) => {
   const [loadingChats, setLoadingChats] = useState(false);
   const [selectedChat, setSelectedChat] = useState(null);
 
-  // ── fetch all chats + seed online status ──
+  // fetch all chats + seed online status 
   const fetchChats = useCallback(async (setOnlineUsers) => {
     if (!user?.accessToken) return;
     try {
@@ -14,7 +14,6 @@ const useChats = (user, setUser) => {
       const { data } = await axiosInstance.get("/chat/all");
       setChats(data);
 
-      // seed online users from populated chat users
       const initialStatus = {};
       data.forEach((chat) => {
         chat.users.forEach((u) => {
@@ -32,7 +31,7 @@ const useChats = (user, setUser) => {
     }
   }, [user]);
 
-  // ── open or create a 1-on-1 chat ──
+  // open or creatinr a 1-on-1 chat
   const accessChat = async (userId) => {
     if (!user?.accessToken || !userId) return;
     try {
@@ -47,7 +46,7 @@ const useChats = (user, setUser) => {
     }
   };
 
-  // ── create group ──
+  // create group
   const createGroupChat = async (selectedUsers, chatName, setSearchResults) => {
     if (!user?.accessToken) return;
     try {
@@ -64,7 +63,7 @@ const useChats = (user, setUser) => {
     }
   };
 
-  // ── rename group ──
+  // rename group
   const renameGroupChat = async (chatId, chatName) => {
     if (!user?.accessToken) return;
     try {
@@ -77,7 +76,7 @@ const useChats = (user, setUser) => {
     }
   };
 
-  // ── add member ──
+  // add member
   const addToGroup = async (chatId, userId) => {
     try {
       const { data } = await axiosInstance.put("/chat/add", { chatId, userId });
@@ -89,7 +88,7 @@ const useChats = (user, setUser) => {
     }
   };
 
-  // ── remove member ──
+  // remove member
   const removeFromGroup = async (chatId, userId) => {
     try {
       const { data } = await axiosInstance.put("/chat/remove", { chatId, userId });

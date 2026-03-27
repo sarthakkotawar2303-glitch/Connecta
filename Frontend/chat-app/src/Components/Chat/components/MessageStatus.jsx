@@ -1,6 +1,4 @@
-// ─── MessageStatus ────────────────────────────────────────
-// Shows a single tick (sent), double tick (delivered), or
-// teal double tick (seen) next to outgoing messages.
+
 
 const CheckIcon = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">

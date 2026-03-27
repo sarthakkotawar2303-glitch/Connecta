@@ -2,11 +2,6 @@ import { useEffect, useState } from "react";
 import { useChat } from "../../../Context/ChatProvider";
 import { formatLastSeen } from "./Chathelpers ";
 
-// ─── GroupInfoPanel ───────────────────────────────────────
-// Right-side panel (group chats only).
-// Lets the group admin rename the group, add / remove members.
-// Regular members can only view the member list.
-
 const FALLBACK_AVATAR =
   "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg";
 
@@ -26,7 +21,6 @@ const GroupInfoPanel = ({ onClose }) => {
 
   const isAdmin = selectedChat?.groupAdmin?._id === user?._id;
 
-  // Debounced user search
   useEffect(() => {
     const t = setTimeout(() => {
       if (memberSearch.trim()) searchUsers?.(memberSearch);
@@ -56,13 +50,12 @@ const GroupInfoPanel = ({ onClose }) => {
     setRemovingUser(null);
   };
 
-  // Filter out users already in the group from search results
   const memberIds = new Set(selectedChat?.users?.map((u) => u._id));
   const filteredResults = searchResults?.filter((u) => !memberIds.has(u._id));
 
   return (
     <div className="w-72 border-l border-slate-800 bg-slate-900 flex flex-col flex-shrink-0">
-      {/* Panel header */}
+      {/* Panel  */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800">
         <h3 className="text-white font-semibold text-sm tracking-wide uppercase">Group Info</h3>
         <button
@@ -76,7 +69,6 @@ const GroupInfoPanel = ({ onClose }) => {
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {/* ── Rename (admin only) ── */}
         {isAdmin && (
           <div className="p-5 border-b border-slate-800">
             <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Group Name</p>
@@ -98,7 +90,6 @@ const GroupInfoPanel = ({ onClose }) => {
           </div>
         )}
 
-        {/* ── Add member (admin only) ── */}
         {isAdmin && (
           <div className="p-5 border-b border-slate-800">
             <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Add Member</p>
@@ -132,7 +123,6 @@ const GroupInfoPanel = ({ onClose }) => {
           </div>
         )}
 
-        {/* ── Member list ── */}
         <div className="p-5">
           <p className="text-xs text-slate-500 uppercase tracking-wider mb-3">
             Members · {selectedChat?.users?.length || 0}
@@ -145,7 +135,6 @@ const GroupInfoPanel = ({ onClose }) => {
 
               return (
                 <div key={u._id} className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-800 transition group">
-                  {/* Avatar with online dot */}
                   <div className="relative flex-shrink-0">
                     <img
                       src={u.pic || FALLBACK_AVATAR}
@@ -157,7 +146,6 @@ const GroupInfoPanel = ({ onClose }) => {
                     )}
                   </div>
 
-                  {/* Name + status */}
                   <div className="flex-1 min-w-0">
                     <p className="text-white text-sm font-medium truncate">
                       {u.username}
@@ -174,7 +162,6 @@ const GroupInfoPanel = ({ onClose }) => {
                     ) : null}
                   </div>
 
-                  {/* Remove button (admin only, not self, not other admin) */}
                   {isAdmin && !isCurrentUser && !isGroupAdmin && (
                     <button
                       onClick={() => handleRemoveMember(u._id)}

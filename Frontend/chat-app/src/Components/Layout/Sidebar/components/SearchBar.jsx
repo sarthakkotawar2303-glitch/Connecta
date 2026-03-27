@@ -1,11 +1,4 @@
-// ─── SearchBar ────────────────────────────────────────────
-// The search input at the top of the sidebar.
-// Shows a clear (✕) button when there's text.
-//
-// Props:
-//   search      – controlled value
-//   onChange    – input change handler
-//   onClear     – clears the input
+
 
 const SearchBar = ({ search, onChange, onClear }) => (
   <div className="relative">

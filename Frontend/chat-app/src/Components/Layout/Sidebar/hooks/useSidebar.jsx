@@ -1,12 +1,7 @@
 import { useState, useEffect } from "react";
 import { useChat } from "../../../../Context/ChatProvider";
 
-/**
- * useSidebar
- * ──────────
- * Owns ALL state and side-effects for the Sidebar.
- * Components stay pure — they only render what this hook gives them.
- */
+
 const useSidebar = () => {
   const {
     chats, loadingChats,
@@ -29,10 +24,8 @@ const useSidebar = () => {
     return () => clearTimeout(delay);
   }, [search]);
 
-  // Prevent crashes before API returns
   const safeUnreadCounts = unreadCounts || {};
 
-  // Open (or create) a DM when a search result is clicked
   const handleUserSelect = async (searchedUser) => {
     setSearch("");
     setSearchResults([]);

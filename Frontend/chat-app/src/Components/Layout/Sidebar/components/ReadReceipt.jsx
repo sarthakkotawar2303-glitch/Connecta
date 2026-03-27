@@ -1,17 +1,8 @@
-// ─── ReadReceipt ──────────────────────────────────────────
-// Shows tick marks on your sent messages inside the chat list.
-//   • Single grey tick  → delivered, not yet read
-//   • Double teal ticks → read by the other person
-//
-// Props:
-//   chat          – chat object (needs latestMessage.readBy)
-//   currentUserId – logged-in user's _id
 
 const ReadReceipt = ({ chat, currentUserId }) => {
   const msg = chat.latestMessage;
   if (!msg) return null;
 
-  // Only show on messages YOU sent
   const senderId =
     typeof msg.sender === "object"
       ? msg.sender?._id?.toString()

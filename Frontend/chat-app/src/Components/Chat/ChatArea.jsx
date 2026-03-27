@@ -7,14 +7,6 @@ import MessageBubble from "./components/MessageBubble";
 import MessageInput from "./components/MessageInput";
 import TypingIndicator from "./components/TypingIndicator";
 import { getOtherUser } from "./components/Chathelpers ";
-// import  getOtherUser  from "./components/ChatHelpers";
-
-// ─── ChatArea ─────────────────────────────────────────────
-// Top-level orchestrator. Owns only:
-//   • UI state (sending, showInfo, showEmoji, editingMessage, editError)
-//   • Refs (bottomRef, inputRef, typingTimerRef, emojiPickerRef)
-//   • Event handlers that coordinate between child components
-// All rendering is delegated to the components above.
 
 const ChatArea = () => {
   const {
@@ -34,13 +26,11 @@ const ChatArea = () => {
   const [editingMessage, setEditingMessage] = useState(null);
   const [editError, setEditError] = useState("");
 
-  // ── Refs ──
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
   const typingTimerRef = useRef(null);
   const emojiPickerRef = useRef(null);
 
-  // ── Close emoji picker on outside click ──
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target)) {
@@ -51,7 +41,6 @@ const ChatArea = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showEmoji]);
 
-  // ── Reset state when switching chats ──
   useEffect(() => {
     setShowInfo(false);
     setNewMessage("");
@@ -61,17 +50,14 @@ const ChatArea = () => {
     clearTimeout(typingTimerRef.current);
   }, [selectedChat?._id]);
 
-  // ── Clean up typing timer on unmount ──
   useEffect(() => {
     return () => clearTimeout(typingTimerRef.current);
   }, []);
 
-  // ── Auto-scroll to bottom on new messages / typing ──
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typingInfo]);
 
-  // ── Send or save edit ──
   const handleSend = async () => {
     const content = newMessage.trim();
     if (!content || !selectedChat || sending) return;

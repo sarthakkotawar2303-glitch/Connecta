@@ -2,12 +2,7 @@ import { formatRelativeTime } from "./Chathelpers ";
 import MessageMenu from "./MessageMenu";
 import MessageStatus from "./MessageStatus";
 
-// ─── MessageBubble ────────────────────────────────────────
-// Renders a single message row including:
-//   • sender avatar (group chats / other user)
-//   • the bubble itself (normal, deleted, or edited)
-//   • the three-dot MessageMenu
-//   • timestamp + seen/delivered ticks
+
 
 const FALLBACK_AVATAR =
   "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg";
@@ -31,13 +26,11 @@ const MessageBubble = ({
   const showAvatar = !isMe && !sameNext;
   const showName = isGroupChat && !isMe && !samePrev;
 
-  // Hidden if the current user deleted it for themselves, or deleted for everyone
   const deletedForMe = msg.deletedFor?.some(
     (id) => id?.toString() === currentUserId?.toString()
   );
   const isHidden = deletedForMe || msg.isDeleted;
 
-  // Bubble corner rounding based on whether messages are "stacked"
   const myCorners = samePrev ? "rounded-2xl rounded-tr-md" : sameNext ? "rounded-2xl rounded-br-md" : "rounded-2xl rounded-tr-md";
   const theirCorners = samePrev ? "rounded-2xl rounded-tl-md" : sameNext ? "rounded-2xl rounded-bl-md" : "rounded-2xl rounded-tl-md";
 
@@ -47,7 +40,6 @@ const MessageBubble = ({
         samePrev ? "mt-0.5" : "mt-4"
       }`}
     >
-      {/* Avatar slot (other user only) */}
       {!isMe && (
         <div className="w-7 flex-shrink-0 self-end mb-0.5">
           {showAvatar && (
@@ -60,7 +52,6 @@ const MessageBubble = ({
         </div>
       )}
 
-      {/* Menu + bubble */}
       <div className={`flex items-end gap-1 max-w-sm lg:max-w-md ${isMe ? "flex-row-reverse" : "flex-row"}`}>
         <MessageMenu
           msg={msg}
@@ -71,18 +62,15 @@ const MessageBubble = ({
         />
 
         <div className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
-          {/* Sender name (group chats only) */}
           {showName && (
             <p className="text-xs text-slate-400 mb-1 ml-1">{msg.sender?.username}</p>
           )}
 
-          {/* Deleted placeholder */}
           {isHidden ? (
             <div className="px-4 py-2.5 text-sm italic text-slate-500 bg-slate-800/50 border border-slate-700/50 rounded-2xl select-none">
               {msg.isDeleted ? "This message was deleted" : "You deleted this message"}
             </div>
           ) : (
-            /* Normal bubble */
             <div
               className={`relative px-4 py-2.5 text-sm break-words leading-relaxed ${
                 isMe
@@ -92,7 +80,6 @@ const MessageBubble = ({
             >
               <span className="pr-16">{msg.content}</span>
 
-              {/* Timestamp row */}
               <span className="absolute bottom-1.5 right-2.5 flex items-center gap-1">
                 {msg.isEdited && (
                   <span className={`text-[10px] leading-none italic ${isMe ? "text-teal-200/60" : "text-slate-500"}`}>

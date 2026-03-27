@@ -1,19 +1,9 @@
 import { FALLBACK_AVATAR } from "../utils/navbarHelpers";
 
-// ─── ProfileDropdown ──────────────────────────────────────
-// User avatar button + small dropdown (username, email, logout).
-//
-// Props:
-//   dropdownRef   – ref for outside-click detection
-//   profileOpen   – boolean
-//   setProfileOpen – toggle
-//   user          – current user object
-//   onLogout      – logout handler
 
 const ProfileDropdown = ({ dropdownRef, profileOpen, setProfileOpen, user, onLogout }) => {
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Trigger */}
       <button
         onClick={() => setProfileOpen((p) => !p)}
         className="flex items-center gap-2 hover:bg-slate-800 rounded-lg px-2 py-1 transition"
@@ -31,16 +21,13 @@ const ProfileDropdown = ({ dropdownRef, profileOpen, setProfileOpen, user, onLog
         </svg>
       </button>
 
-      {/* Dropdown */}
       {profileOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-50 overflow-hidden">
-          {/* User info */}
           <div className="px-4 py-3 border-b border-slate-700">
             <p className="text-white font-medium text-sm">{user?.username}</p>
             <p className="text-slate-400 text-xs truncate">{user?.email}</p>
           </div>
 
-          {/* Logout */}
           <button
             onClick={onLogout}
             className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-slate-700 transition flex items-center gap-2"

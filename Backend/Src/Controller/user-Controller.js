@@ -45,7 +45,7 @@ const signUp = async (req, res) => {
     const accessToken = generateAccessToken(newUser._id);
     const refreshToken = generateRefreshToken(newUser._id);
 
-    // Save refresh token in DB
+    
     newUser.refreshToken = refreshToken;
     await newUser.save();
 

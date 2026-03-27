@@ -1,8 +1,4 @@
 
-// ─── ChatHeader ───────────────────────────────────────────
-// Top bar showing avatar, name, online status / typing,
-// back button, and the Group Info toggle.
-
 import { formatLastSeen } from "./Chathelpers ";
 
 const FALLBACK_AVATAR =

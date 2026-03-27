@@ -1,18 +1,5 @@
 import { FALLBACK_AVATAR } from "../utils/navbarHelpers";
 
-// ─── CreateGroupModal ─────────────────────────────────────
-// Full-screen modal for creating a new group chat.
-//
-// Props:
-//   groupName, setGroupName   – controlled input
-//   search, setSearch         – member search input
-//   searchResults             – users returned from API
-//   selectedUsers             – users added to the group
-//   loading                   – create button spinner
-//   onAddUser(user)           – add a user to selectedUsers
-//   onRemoveUser(id)          – remove a user from selectedUsers
-//   onCreateGroup()           – submit handler
-//   onClose()                 – close + reset modal
 
 const CreateGroupModal = ({
   groupName, setGroupName,

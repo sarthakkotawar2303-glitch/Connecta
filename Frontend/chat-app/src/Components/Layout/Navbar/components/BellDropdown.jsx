@@ -1,17 +1,6 @@
 import { getChatName, getChatPic, getMessagePreview, FALLBACK_AVATAR } from "../utils/navbarHelpers";
 
-// ─── BellDropdown ─────────────────────────────────────────
-// Notification bell button + dropdown list of unread chats.
-//
-// Props:
-//   bellRef        – ref for outside-click detection (owned by useNavbar)
-//   bellOpen       – boolean
-//   setBellOpen    – toggle
-//   totalUnread    – number shown on badge
-//   unreadChats    – array of chat objects with unread messages
-//   unreadCounts   – { [chatId]: number }
-//   user           – current user
-//   onChatClick    – called with a chat when user clicks a row
+ 
 
 const GroupIcon = () => (
   <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -33,7 +22,6 @@ const BellDropdown = ({
 }) => {
   return (
     <div className="relative" ref={bellRef}>
-      {/* Bell button */}
       <button
         onClick={() => setBellOpen((v) => !v)}
         className={`w-9 h-9 flex items-center justify-center rounded-lg transition ${
@@ -46,18 +34,15 @@ const BellDropdown = ({
         <BellIcon className="w-5 h-5" />
       </button>
 
-      {/* Unread badge */}
       {totalUnread > 0 && (
         <span className="absolute -top-1 -right-1 bg-teal-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center leading-none pointer-events-none">
           {totalUnread > 99 ? "99+" : totalUnread}
         </span>
       )}
 
-      {/* Dropdown panel */}
       {bellOpen && (
         <div className="absolute right-0 mt-2 w-72 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden">
 
-          {/* Header */}
           <div className="px-4 py-3 border-b border-slate-700 flex items-center justify-between">
             <p className="text-white font-semibold text-sm">Notifications</p>
             {totalUnread > 0 && (
@@ -67,7 +52,6 @@ const BellDropdown = ({
             )}
           </div>
 
-          {/* Empty state */}
           {unreadChats.length === 0 ? (
             <div className="px-4 py-6 text-center">
               <div className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -90,7 +74,6 @@ const BellDropdown = ({
                     onClick={() => onChatClick(chat)}
                     className="flex items-center gap-3 px-4 py-3 hover:bg-slate-700 cursor-pointer transition border-b border-slate-700/50 last:border-0"
                   >
-                    {/* Avatar */}
                     <div className="relative flex-shrink-0">
                       {chat.isGroupChat ? (
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center">
@@ -103,13 +86,11 @@ const BellDropdown = ({
                           className="w-10 h-10 rounded-full object-cover border border-slate-600"
                         />
                       )}
-                      {/* Count bubble */}
                       <span className="absolute -top-1 -right-1 bg-teal-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center leading-none">
                         {count > 99 ? "99+" : count}
                       </span>
                     </div>
 
-                    {/* Text */}
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-semibold truncate">{name}</p>
                       <p className="text-slate-400 text-xs truncate">{preview}</p>

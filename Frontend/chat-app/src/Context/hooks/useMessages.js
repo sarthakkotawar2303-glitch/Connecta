@@ -6,7 +6,7 @@ const useMessages = (user, socketRef) => {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [unreadCounts, setUnreadCounts] = useState({});
 
-  // ── fetch all messages for a chat ──
+  // fetch all messages for a chat
   const fetchMessages = useCallback(async (chatId) => {
     if (!chatId) return;
     try {
@@ -20,7 +20,7 @@ const useMessages = (user, socketRef) => {
     }
   }, []);
 
-  // ── fetch unread counts for sidebar badges ──
+  // fetch unread counts for sidebar badges
   const fetchUnreadCounts = useCallback(async () => {
     if (!user?.accessToken) return;
     try {
@@ -31,7 +31,7 @@ const useMessages = (user, socketRef) => {
     }
   }, [user]);
 
-  // ── mark all messages in a chat as read ──
+  // mark all messages in a chat as read
   const markAsRead = useCallback(async (chatId) => {
     if (!chatId) return;
     try {
@@ -41,20 +41,21 @@ const useMessages = (user, socketRef) => {
         delete updated[chatId];
         return updated;
       });
-      // tell server so it broadcasts "messages read" to other clients
+     
       socketRef.current?.emit("mark read", { chatId, userId: user?._id });
     } catch (error) {
       console.error("markAsRead:", error?.response?.data?.message);
     }
   }, [user?._id]);
 
-  // ── send a new message ──
+  // send a new message
   const sendMessage = async (chatId, content, setChats) => {
     if (!chatId || !content?.trim()) return;
     try {
       const { data } = await axiosInstance.post("/message", { chatId, content });
       setMessages((prev) => [...prev, data]);
-      // update sidebar latest message preview
+      
+
       setChats((prev) =>
         prev.map((c) => c._id === chatId ? { ...c, latestMessage: data } : c)
       );
@@ -64,23 +65,29 @@ const useMessages = (user, socketRef) => {
     }
   };
 
-  // ── delete a message ──
+  // delete a message
   const deleteMessage = async (messageId, deleteForEveryone) => {
     try {
       const { data } = await axiosInstance.delete(`/message/${messageId}`, {
         data: { deleteForEveryone },
       });
-      setMessages((prev) => prev.map((m) => m._id === messageId ? data : m));
+
+    if(deleteForEveryone){
+      setMessages((prev)=>prev.map((m)=>m._id===messageId?data:m))
       socketRef.current?.emit("message deleted", {
         message: data,
         chatId: data.chat?._id || data.chat,
       });
+    }else{
+      setMessages((prev)=>prev.filter((m)=>m._id!==messageId))
+    }
+      
     } catch (error) {
       console.error("deleteMessage:", error?.response?.data?.message);
     }
   };
 
-  // ── edit a message ──
+  // edit a message
   const editMessage = async (messageId, content) => {
     try {
       const { data } = await axiosInstance.put(`/message/${messageId}`, { content });

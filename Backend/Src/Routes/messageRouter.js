@@ -11,9 +11,9 @@ const messageRouter = express.Router();
 
 messageRouter.get("/unread/counts", auth, getUnreadCounts)
 messageRouter.post("/", auth, sendMessage)
-messageRouter.put("/read/:chatId", auth, markAsRead)   // FIX 10: was missing entirely!
+messageRouter.put("/read/:chatId", auth, markAsRead)   
 messageRouter.get("/:chatId", auth, allMessages)
-messageRouter.delete("/:messageId", auth, deleteMessage) // FIX 11: was mapped to editMsg
-messageRouter.put("/:messageId", auth, editMessage)      // FIX 11: was mapped to deleteMsg
+messageRouter.delete("/:messageId", auth, deleteMessage) 
+messageRouter.put("/:messageId", auth, editMessage)      
 
 module.exports = messageRouter;

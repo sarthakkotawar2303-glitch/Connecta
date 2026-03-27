@@ -26,11 +26,11 @@ const UserSchema = new mongoose.Schema({
         default:
             "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
     },
-    isOnline: {                      // ← ADD THIS
+    isOnline: {                      
         type: Boolean,
         default: false,
     },
-    lastSeen: {                      // ← ADD THIS
+    lastSeen: {                     
         type: Date,
         default: Date.now,
     },

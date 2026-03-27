@@ -34,7 +34,7 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  console.log("🔌 Connected:", socket.id);
+  console.log("Connected:", socket.id);
 
   socket.on("setup", async (userId) => {
     socket.join(userId);
@@ -66,8 +66,7 @@ io.on("connection", (socket) => {
       socket.to(userId).emit("notification received", messageData);
     });
 
-    // ← CHANGE 2: emit "message delivered" ONCE to sender after loop
-    // not inside loop — avoids duplicate delivered events per recipient
+   
     socket.to(senderId).emit("message delivered", {
       messageId: messageData._id,
       chatId: chat._id,
@@ -82,18 +81,15 @@ io.on("connection", (socket) => {
     socket.to(chatId).emit("stop typing", { chatId });
   });
 
-  // ← CHANGE 3: new event — client emits after markAsRead REST call
-  // server forwards "messages read" to everyone else in the chat room
+
   socket.on("mark read", ({ chatId, userId }) => {
     socket.to(chatId).emit("messages read", { chatId, userId });
   });
 
-  // ── message deleted — broadcast to chat room ──
 socket.on("message deleted", ({ message, chatId }) => {
   socket.to(chatId).emit("message deleted", message);
 });
 
-// ── message edited — broadcast to chat room ──
 socket.on("message edited", ({ message, chatId }) => {
   socket.to(chatId).emit("message edited", message);
 });

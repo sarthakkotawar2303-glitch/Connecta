@@ -3,13 +3,7 @@ import SearchBar from "./components/SearchBar";
 import SearchResults from "./components/SearchResults";
 import ChatRow from "./components/ChatRow";
 
-// ─── Sidebar ──────────────────────────────────────────────
-// Pure layout shell. All logic lives in useSidebar().
-//
-// To add a new feature:
-//   1. Add state/handler to hooks/useSidebar.js
-//   2. Create a component in components/
-//   3. Import both here and wire up
+
 
 const Sidebar = () => {
   const {
@@ -24,10 +18,10 @@ const Sidebar = () => {
   } = useSidebar();
 
   return (
-    <div className="w-72 bg-slate-900 border-r border-slate-800 flex flex-col h-full flex-shrink-0">
-
-      {/* ── Header ── */}
-      <div className="px-4 pt-4 pb-3 border-b border-slate-800">
+    <div className="w-80 bg-slate-900 border-r border-slate-700 flex flex-col h-full flex-shrink-0">
+     
+     
+      <div className="px-4 pt-4 pb-3 border-b border-slate-700">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-white font-semibold text-base">Messages</h2>
         </div>
@@ -51,8 +45,8 @@ const Sidebar = () => {
 
         {/* Loading */}
         {loadingChats && (
-          <div className="flex justify-center py-8">
-            <div className="w-5 h-5 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+          <div className="flex justify-center py-8 ">
+            <div className="w-5 h-6 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
           </div>
         )}
 

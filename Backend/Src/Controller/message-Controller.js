@@ -2,6 +2,7 @@ const chatModel = require("../Model/chatModel");
 const Message = require("../Model/msgModel");
 const User = require("../Model/userModel");
 
+//fetching all msges
 const allMessages = async (req, res) => {
   try {
     const messages = await Message.find({ chat: req.params.chatId })
@@ -13,6 +14,7 @@ const allMessages = async (req, res) => {
   }
 };
 
+//send msg
 const sendMessage = async (req, res) => {
   try {
     const { content, chatId } = req.body;
@@ -56,7 +58,7 @@ const getUnreadCounts = async (req, res) => {
   try {
     const unreadCounts = await Message.aggregate([
       { $match: { readBy: { $nin: [req.user._id] } } },
-      { $group: { _id: "$chat", count: { $sum: 1 } } },
+      { $group: { _id: "$chat", count: { $sum: 0 } } },
     ]);
     const countsMap = {};
     unreadCounts.forEach((item) => {
@@ -68,21 +70,18 @@ const getUnreadCounts = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────
-// DELETE /api/message/:messageId
-// ─────────────────────────────────────────
+
 const deleteMessage = async (req, res) => {
   try {
     const { messageId } = req.params;
-    const { deleteForEveryone } = req.body; // FIX 1: was destructuring array [deleteForAll]
+    const { deleteForEveryone } = req.body; 
 
-    const message = await Message.findById(messageId); // FIX 2: was "msg", inconsistent naming
+    const message = await Message.findById(messageId); 
 
     if (!message) {
       return res.status(404).json({ message: "Message not found" });
     }
 
-    // FIX 3: was comparing to sender._id which is undefined — use message.sender
     if (deleteForEveryone && message.sender.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: "Not Authorized" });
     }
@@ -92,14 +91,12 @@ const deleteMessage = async (req, res) => {
       message.content = "This message was deleted";
       await message.save();
     } else {
-      // FIX 4: was calling msg.findByIdAndUpdate (method on instance, not model)
-      // and missing $addToSet for deletedFor
+      
       await Message.findByIdAndUpdate(messageId, {
         $addToSet: { deletedFor: req.user._id },
       });
     }
 
-    // FIX 5: was missing the populated response after delete-for-me branch
     const updated = await Message.findById(messageId)
       .populate("sender", "username pic")
       .populate("chat");
@@ -110,9 +107,7 @@ const deleteMessage = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────
-// PUT /api/message/:messageId
-// ─────────────────────────────────────────
+
 const editMessage = async (req, res) => {
   try {
     const { messageId } = req.params;
@@ -120,7 +115,6 @@ const editMessage = async (req, res) => {
 
     const message = await Message.findById(messageId);
 
-    // FIX 6: was checking !messageId instead of !message
     if (!message) {
       return res.status(404).json({ message: "Message not found" });
     }
@@ -136,9 +130,9 @@ const editMessage = async (req, res) => {
 
     message.content = content;
     message.isEdited = true;
-    await message.save(); // FIX 7: was "mes.save()" — typo, undefined variable
+    await message.save(); 
 
-    // FIX 8: was Message.find(messageId) — should be findById, and populate chained wrong
+   
     const updated = await Message.findById(messageId)
       .populate("sender", "username pic")
       .populate("chat");

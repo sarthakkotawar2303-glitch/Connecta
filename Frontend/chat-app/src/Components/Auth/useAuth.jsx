@@ -19,7 +19,7 @@ const useAuth = () => {
     pic: null,
   });
 
-  // cleanup blob url on unmount
+  
   useEffect(() => {
     return () => { if (preview) URL.revokeObjectURL(preview); };
   }, [preview]);

@@ -1,5 +1,3 @@
-// ─── TypingIndicator ─────────────────────────────────────
-// Shows an animated "..." bubble when another user is typing.
 
 const TypingIndicator = ({ username }) => (
   <div className="flex items-end gap-2 mt-3">

@@ -1,17 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { canEdit } from "./Chathelpers ";
 
-// ─── MessageMenu ──────────────────────────────────────────
-// Three-dot context menu on each message bubble.
-// Shows Edit (within 15 min, own messages), Delete for me,
-// and Delete for everyone (own messages only).
-
 const MessageMenu = ({ msg, currentUserId, onEdit, onDeleteForMe, onDeleteForEveryone }) => {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
   const isMe = msg.sender?._id === currentUserId;
 
-  // Close when clicking outside
   useEffect(() => {
     const handler = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false);
@@ -24,7 +18,6 @@ const MessageMenu = ({ msg, currentUserId, onEdit, onDeleteForMe, onDeleteForEve
 
   return (
     <div className="relative flex-shrink-0" ref={menuRef}>
-      {/* Trigger */}
       <button
         onClick={() => setOpen((v) => !v)}
         className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-slate-700 text-slate-400 hover:text-white transition opacity-0 group-hover:opacity-100"
@@ -34,14 +27,12 @@ const MessageMenu = ({ msg, currentUserId, onEdit, onDeleteForMe, onDeleteForEve
         </svg>
       </button>
 
-      {/* Dropdown */}
       {open && (
         <div
           className={`absolute bottom-7 z-50 w-44 bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden ${
             isMe ? "right-0" : "left-0"
           }`}
         >
-          {/* Edit — only for own messages within 15 min */}
           {isMe && canEdit(msg) && (
             <button
               onClick={() => { onEdit(msg); setOpen(false); }}
@@ -55,7 +46,6 @@ const MessageMenu = ({ msg, currentUserId, onEdit, onDeleteForMe, onDeleteForEve
             </button>
           )}
 
-          {/* Delete for me */}
           <button
             onClick={() => { onDeleteForMe(msg._id); setOpen(false); }}
             className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-slate-700 transition flex items-center gap-2"
@@ -67,7 +57,6 @@ const MessageMenu = ({ msg, currentUserId, onEdit, onDeleteForMe, onDeleteForEve
             Delete for me
           </button>
 
-          {/* Delete for everyone — only own messages */}
           {isMe && (
             <button
               onClick={() => { onDeleteForEveryone(msg._id); setOpen(false); }}
