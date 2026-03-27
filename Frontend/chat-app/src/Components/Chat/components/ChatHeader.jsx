@@ -1,5 +1,5 @@
 
-import { formatLastSeen } from "./Chathelpers ";
+import { formatLastSeen } from "./ChatHelpers";
 
 const FALLBACK_AVATAR =
   "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg";

@@ -1,4 +1,4 @@
-import { formatRelativeTime } from "./Chathelpers ";
+import { formatRelativeTime } from "./ChatHelpers";
 import MessageMenu from "./MessageMenu";
 import MessageStatus from "./MessageStatus";
 

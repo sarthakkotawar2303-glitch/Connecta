@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { canEdit } from "./Chathelpers ";
+import { canEdit } from "./ChatHelpers";
 
 const MessageMenu = ({ msg, currentUserId, onEdit, onDeleteForMe, onDeleteForEveryone }) => {
   const [open, setOpen] = useState(false);
