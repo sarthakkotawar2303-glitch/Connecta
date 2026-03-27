@@ -6,7 +6,7 @@ import GroupInfoPanel from "./components/GroupInfoPanel";
 import MessageBubble from "./components/MessageBubble";
 import MessageInput from "./components/MessageInput";
 import TypingIndicator from "./components/TypingIndicator";
-import { getOtherUser } from "./components/Chathelpers";
+import { getOtherUser } from "./components/ChatHelpers";
 
 const ChatArea = () => {
   const {
