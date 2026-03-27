@@ -1,5 +1,6 @@
 
-export const canEdit = (msg) => {
+
+  export  const canEdit = (msg) => {
   const ageInMinutes = (Date.now() - new Date(msg.createdAt)) / 1000 / 60;
   return ageInMinutes <= 15;
 };
