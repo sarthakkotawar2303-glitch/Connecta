@@ -44,7 +44,15 @@ const AuthPage = () => {
                 <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767A4 4 0 0015 13h2a2 2 0 002-2V9a2 2 0 00-2-2h-2z" />
               </svg>
             </div>
-            <span className="text-2xl font-bold text-white tracking-tight">Ping</span>
+            <span className="text-2xl font-bold text-white tracking-tight"> <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center">
+            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
+              <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767A4 4 0 0015 13h2a2 2 0 002-2V9a2 2 0 00-2-2h-2z" />
+            </svg>
+          </div>
+          <span className="text-white font-bold text-lg tracking-tight">Connecta</span>
+        </div></span>
           </div>
           <p className="text-slate-400 text-sm">
             {isLogin ? "Welcome back! Sign in to continue." : "Create your account to get started."}
