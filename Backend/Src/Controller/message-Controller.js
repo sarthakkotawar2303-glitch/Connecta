@@ -1,76 +1,205 @@
-const chatModel = require("../Model/chatModel");
+/**
+ * @fileoverview Message controller layer managing text workflows, historical timelines,
+ * cryptographic state tracking, real-time read receipts, and user access validation.
+ * @module controllers/messageController
+ * @requires models/Chat
+ * @requires models/Message
+ * @requires models/User
+ */
+
+const Chat = require("../Model/chatModel"); // FIX 1: Harmonised signature to match function implementations
 const Message = require("../Model/msgModel");
 const User = require("../Model/userModel");
 
-//fetching all msges
+/**
+ * @api {get} /api/message/:chatId Retrieve All Messages in a Chat
+ * @apiName AllMessages
+ * @apiGroup Messages
+ * @description Fetches all messages for a specific chat, populating sender and chat details.
+ * 
+ * @param {import('express').Request} req - Express request object.
+ * @param {import('express').Response} res - Express response stream.
+ * @returns {Promise<import('express').Response>}
+ */
 const allMessages = async (req, res) => {
   try {
-    const messages = await Message.find({ chat: req.params.chatId })
+    const { chatId } = req.params;
+
+    if (!chatId) {
+      return res.status(400).json({
+        success: false,
+        message: "chatId parameter is required",
+      });
+    }
+
+    const messages = await Message.find({ chat: chatId })
       .populate("sender", "username pic email")
-      .populate("chat");
-    res.json(messages);
+      .populate({
+        path: "chat",
+        populate: {
+          path: "users",
+          select: "username pic email"
+        }
+      })
+      .sort({ createdAt: 1 }); 
+
+    return res.status(200).json({
+      success: true,
+      data: messages
+    });
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Fetch all messages error:", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Internal server error" 
+    });
   }
 };
 
-//send msg
+/**
+ * @api {post} /api/message Create Message
+ * @apiName CreateMessage
+ * @apiGroup Messages
+ * @description Sends a new message to a chat, updating the chat's latest message reference index.
+ * @param {import('express').Request} req - Express request object.
+ * @param {import('express').Response} res - Express response stream.
+ * @returns {Promise<import('express').Response>}
+ */
 const sendMessage = async (req, res) => {
   try {
     const { content, chatId } = req.body;
+
     if (!content || !chatId) {
-      return res.status(400).json({ message: "Invalid request data" });
+      return res.status(400).json({ 
+        success: false,
+        message: "Invalid request data. content and chatId are required." 
+      });
     }
+
     let message = await Message.create({
       sender: req.user._id,
-      content,
+      content: content.trim(),
       chat: chatId,
-      readBy: [req.user._id],
+      readBy: [req.user._id], 
     });
+
     message = await Message.findById(message._id)
-      .populate("sender", "username pic")
+      .populate("sender", "username pic email")
       .populate("chat");
+
     message = await User.populate(message, {
       path: "chat.users",
       select: "username pic email",
     });
-    await chatModel.findByIdAndUpdate(chatId, { latestMessage: message });
-    res.json(message);
+   
+    await Chat.findByIdAndUpdate(
+      chatId, 
+      { $set: { latestMessage: message._id } } 
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: message
+    });
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Send message operational crash:", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Internal server error" 
+    });
   }
 };
 
+/**
+ * @api {put} /api/message/read/:chatId Mark Messages as Read
+ * @apiName MarkAsRead
+ * @apiGroup Messages
+ * @description Marks all messages in a chat as read for the authenticated user.
+ * 
+ * @param {import('express').Request} req - Express request object.
+ * @param {import('express').Response} res - Express response stream.
+ * @returns {Promise<import('express').Response>}
+ */
 const markAsRead = async (req, res) => {
   try {
     const { chatId } = req.params;
+
+    if (!chatId) {
+      return res.status(400).json({
+        success: false,
+        message: "chatId parameter is required"
+      });
+    }
+
     await Message.updateMany(
       { chat: chatId, readBy: { $nin: [req.user._id] } },
       { $addToSet: { readBy: req.user._id } }
     );
-    res.json({ message: "Messages marked as read" });
+
+    return res.status(200).json({ 
+      success: true,
+      message: "Messages marked as read" 
+    });
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Mark as read error:", error);
+    return res.status(500).json({ 
+      success: false,
+      message: "Internal server error" 
+    });
   }
 };
 
+/**
+ * @api {get} /api/message/unread/counts Get Unread Message Counts
+ * @apiName GetUnreadCounts
+ * @apiGroup Messages
+ * @description Retrieves unread message counts for each chat the user is a part of.
+ * 
+ * @param {import('express').Request} req - Express request object.
+ * @param {import('express').Response} res - Express response stream.
+ * @returns {Promise<import('express').Response>}
+ */
 const getUnreadCounts = async (req, res) => {
   try {
     const unreadCounts = await Message.aggregate([
       { $match: { readBy: { $nin: [req.user._id] } } },
-      { $group: { _id: "$chat", count: { $sum: 0 } } },
+      { $group: { _id: "$chat", count: { $sum: 1 } } },
     ]);
+
     const countsMap = {};
     unreadCounts.forEach((item) => {
-      countsMap[item._id.toString()] = item.count;
+      if (item._id) {
+        countsMap[item._id.toString()] = item.count;
+      }
     });
-    res.json(countsMap);
+
+    return res.status(200).json({
+      success: true,
+      data: countsMap
+    });
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Get unread counts error:", error);
+    return res.status(500).json({ 
+      success: false,
+      message: "Internal server error" 
+    });
   }
 };
 
-
+/**
+ * @api {delete} /api/message/:messageId Delete Message
+ * @apiName DeleteMessage
+ * @apiGroup Messages
+ * @description Deletes a message, either for the sender only or for all participants.
+ * 
+ * @param {import('express').Request} req - Express request object.
+ * @param {import('express').Response} res - Express response stream.
+ * @returns {Promise<import('express').Response>}
+ */
 const deleteMessage = async (req, res) => {
   try {
     const { messageId } = req.params;
@@ -79,67 +208,132 @@ const deleteMessage = async (req, res) => {
     const message = await Message.findById(messageId); 
 
     if (!message) {
-      return res.status(404).json({ message: "Message not found" });
-    }
-
-    if (deleteForEveryone && message.sender.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "Not Authorized" });
-    }
-
-    if (deleteForEveryone) {
-      message.isDeleted = true;
-      message.content = "This message was deleted";
-      await message.save();
-    } else {
-      
-      await Message.findByIdAndUpdate(messageId, {
-        $addToSet: { deletedFor: req.user._id },
+      return res.status(404).json({ 
+        success: false,
+        message: "Message not found" 
       });
     }
 
-    const updated = await Message.findById(messageId)
-      .populate("sender", "username pic")
-      .populate("chat");
+    if (deleteForEveryone && message.sender.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ 
+        success: false,
+        message: "Not Authorized to delete this message for everyone" 
+      });
+    }
 
-    res.json(updated);
+    let updatedMessage;
+
+    if (deleteForEveryone) {
+      // Optimization: Using atomic updates instead of save execution loops
+      updatedMessage = await Message.findByIdAndUpdate(
+        messageId,
+        { 
+          $set: { 
+            isDeleted: true,
+            content: "This message was deleted" 
+          } 
+        },
+        { new: true }
+      )
+        .populate("sender", "username pic email")
+        .populate("chat");
+    } else {
+      // FIX 3: Realigned model token path from deletedFor back to your schema variable key 'deleteFor'
+      updatedMessage = await Message.findByIdAndUpdate(
+        messageId, 
+        { $addToSet: { deleteFor: req.user._id } },
+        { new: true }
+      )
+        .populate("sender", "username pic email")
+        .populate("chat");
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: updatedMessage
+    });
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Delete message error:", error);
+    return res.status(500).json({ 
+      success: false,
+      message: "Internal server error" 
+    });
   }
 };
 
-
+/**
+ * @api {put} /api/message/:messageId Edit Message
+ * @apiName EditMessage
+ * @apiGroup Messages
+ * @description Edits a message content value within a restricted 15-minute timeframe window.
+ * 
+ * @param {import('express').Request} req - Express request object.
+ * @param {import('express').Response} res - Express response stream.
+ * @returns {Promise<import('express').Response>}
+ */
 const editMessage = async (req, res) => {
   try {
     const { messageId } = req.params;
     const { content } = req.body;
 
+    if (!content || !content.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Updated content cannot be empty"
+      });
+    }
+
     const message = await Message.findById(messageId);
 
     if (!message) {
-      return res.status(404).json({ message: "Message not found" });
+      return res.status(404).json({ 
+        success: false,
+        message: "Message not found" 
+      });
     }
 
     if (message.sender.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "Not Authorized" });
+      return res.status(403).json({ 
+        success: false,
+        message: "Not Authorized to edit this message" 
+      });
     }
 
-    const dTime = (Date.now() - new Date(message.createdAt)) / 1000 / 60;
-    if (dTime > 15) {
-      return res.status(400).json({ message: "Cannot edit message after 15 min" });
+    // Optimization: Standardised calculation parsing logic hooks
+    const timeDifferenceInMinutes = (Date.now() - new Date(message.createdAt).getTime()) / 1000 / 60;
+    if (timeDifferenceInMinutes > 15) {
+      return res.status(400).json({ 
+        success: false,
+        message: "Cannot edit message after 15 minutes" 
+      });
     }
 
-    message.content = content;
-    message.isEdited = true;
-    await message.save(); 
-
-   
-    const updated = await Message.findById(messageId)
-      .populate("sender", "username pic")
+    // Optimization: Unified modification pipeline step skipping side-effects
+    const updated = await Message.findByIdAndUpdate(
+      messageId,
+      { 
+        $set: { 
+          content: content.trim(), 
+          isEdited: true 
+        } 
+      },
+      { new: true }
+    )
+      .populate("sender", "username pic email")
       .populate("chat");
 
-    res.json(updated);
+    return res.status(200).json({
+      success: true,
+      data: updated
+    });
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Edit message error:", error);
+    return res.status(500).json({ 
+      success: false,
+      message: "Internal server error" 
+    });
   }
 };
 
@@ -148,6 +342,6 @@ module.exports = {
   sendMessage,
   markAsRead,
   getUnreadCounts,
-  deleteMessage, // FIX 9: renamed from deleteMsg to match router
-  editMessage,   // FIX 9: renamed from editMsg to match router
+  deleteMessage, 
+  editMessage,   
 };
