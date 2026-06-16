@@ -57,11 +57,14 @@ const initSocket = (server) => {
 
       const senderId = messageData.sender?._id?.toString();
 
+      // Emit to the entire chat room once (excluding current sender socket)
+      socket.to(chat._id).emit("message received", messageData);
+
+      // Emit notifications to recipient users individually
       chat.users.forEach((user) => {
         const userId = typeof user === "object" ? user._id?.toString() : user?.toString();
         if (userId === senderId) return;
 
-        socket.to(chat._id).emit("message received", messageData);
         socket.to(userId).emit("notification received", messageData);
       });
 
@@ -96,14 +99,14 @@ const initSocket = (server) => {
      * Broadcasts message deletion event to chat participants.
      */
     socket.on("message deleted", ({ message, chatId }) => {
-      socket.to(chatId).emit("message deleted", message);
+      socket.to(chatId).emit("message deleted", { message });
     });
 
     /**
      * Broadcasts message modification event to chat participants.
      */
     socket.on("message edited", ({ message, chatId }) => {
-      socket.to(chatId).emit("message edited", message);
+      socket.to(chatId).emit("message edited", { message });
     });
 
     /**

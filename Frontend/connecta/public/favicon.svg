@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0056B3" />
+      <stop offset="100%" stop-color="#007AFF" />
+    </linearGradient>
+  </defs>
+  <!-- Background squircle -->
+  <rect width="100" height="100" rx="24" fill="url(#brand-grad)" />
+  
+  <!-- Spoke Lines -->
+  <line x1="50" y1="50" x2="50" y2="22" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
+  <line x1="50" y1="50" x2="77" y2="40.5" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
+  <line x1="50" y1="50" x2="67" y2="72.5" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
+  <line x1="50" y1="50" x2="33" y2="72.5" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
+  <line x1="50" y1="50" x2="23" y2="40.5" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
+
+  <!-- Center Circle -->
+  <circle cx="50" cy="50" r="13" fill="#007AFF" stroke="#FFFFFF" stroke-width="6" />
+
+  <!-- Outer Circles -->
+  <circle cx="50" cy="22" r="8" fill="#007AFF" stroke="#FFFFFF" stroke-width="6" />
+  <circle cx="77" cy="40.5" r="8" fill="#007AFF" stroke="#FFFFFF" stroke-width="6" />
+  <circle cx="67" cy="72.5" r="8" fill="#007AFF" stroke="#FFFFFF" stroke-width="6" />
+  <circle cx="33" cy="72.5" r="8" fill="#007AFF" stroke="#FFFFFF" stroke-width="6" />
+  <circle cx="23" cy="40.5" r="8" fill="#007AFF" stroke="#FFFFFF" stroke-width="6" />
+</svg>

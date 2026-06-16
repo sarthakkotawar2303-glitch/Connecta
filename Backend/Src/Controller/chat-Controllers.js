@@ -84,6 +84,7 @@ const accessChats = async (req, res) => {
 const fetchChats = async (req, res) => {
   try {
     let chats = await Chat.find({
+      users: { $elemMatch: { $eq: req.user._id } }
     })
       .populate("users", "-password -refreshToken")
       .populate("groupAdmin", "-password -refreshToken")

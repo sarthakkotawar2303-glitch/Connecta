@@ -50,8 +50,12 @@ const signUp = async (req, res) => {
       "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg";
 
     if (req.file) {
-      const uploaded = await uploadToCloudinary(req.file.path);
-      imageUrl = uploaded.url;
+      try {
+        const uploaded = await uploadToCloudinary(req.file.path);
+        imageUrl = uploaded.url;
+      } catch (uploadError) {
+        console.error("Cloudinary upload failed, falling back to default placeholder:", uploadError);
+      }
     }
 
     const newUser = await User.create({
