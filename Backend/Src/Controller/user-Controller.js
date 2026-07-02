@@ -8,18 +8,6 @@ const uploadToCloudinary = require("../service/cloudinary");
  * @apiGroup Authentication
  * @description Registers a new user with email and password, handles optional profile picture 
  * uploads to Cloudinary, generates authentication tokens, and sets a secure HttpOnly cookie.
- * @async
- * @function signUp
- * @param {Object} req - Express request object.
- * @param {Object} req.body - The request body.
- * @param {string} req.body.username - The username of the user.
- * @param {string} req.body.email - The email address of the user.
- * @param {string} req.body.password - The password of the user.
- * @param {Object} [req.file] - Optional profile picture uploaded via Multer.
- * @param {string} req.file.path - Local path of the uploaded profile picture.
- * @param {Object} res - Express response object.
- * @param {import('express').NextFunction} next - Express next middleware function.
- * @returns {Promise<Object>} Express response JSON object containing user details and access token on success, or an error message.
  */
 const signUp = async (req, res, next) => {
   try {
@@ -94,10 +82,6 @@ const signUp = async (req, res, next) => {
  * @apiName LoginUser
  * @apiGroup Authentication
  * @description Validates user email and password fields, creates fresh authorization token pairs, updates state vectors via isolated updates, and sets persistent response cookies.
- * @param {import('express').Request} req - Express request object.
- * @param {import('express').Response} res - Express response object.
- * @param {import('express').NextFunction} next - Express next middleware function.
- * @returns {Promise<import('express').Response>}
  */
 const loginUser = async (req, res, next) => {
   try {
@@ -154,10 +138,6 @@ const loginUser = async (req, res, next) => {
  * @apiName AllUsers
  * @apiGroup Users
  * @description Queries the user collection to search for active application accounts using a partial, case-insensitive string match on username or email fields. Automatically filters out the requesting user's profile from the results and strips sensitive tokens.
- * @param {import('express').Request} req - Express request object.
- * @param {import('express').Response} res - Express response object.
- * @param {import('express').NextFunction} next - Express next middleware function.
- * @returns {Promise<import('express').Response>}
  */
 const allUsers = async (req, res, next) => {
   try {
@@ -191,10 +171,6 @@ const allUsers = async (req, res, next) => {
  * @apiName LogoutUser
  * @apiGroup Authentication
  * @description Inactivates user sessions by extracting the refresh token from client cookies, purging the active token from the respective database record, and clearing the HttpOnly cookie.
- * @param {import('express').Request} req - Express request object.
- * @param {import('express').Response} res - Express response object.
- * @param {import('express').NextFunction} next - Express next middleware function.
- * @returns {Promise<import('express').Response>}
  */
 const logoutUser = async (req, res, next) => {
   try {

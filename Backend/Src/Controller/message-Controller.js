@@ -58,10 +58,6 @@ const allMessages = async (req, res, next) => {
  * @apiName CreateMessage
  * @apiGroup Messages
  * @description Sends a new message to a chat, updating the chat's latest message reference index.
- * @param {import('express').Request} req - Express request object.
- * @param {import('express').Response} res - Express response stream.
- * @param {import('express').NextFunction} next - Express next middleware function.
- * @returns {Promise<import('express').Response>}
  */
 const sendMessage = async (req, res, next) => {
   try {
@@ -108,11 +104,6 @@ const sendMessage = async (req, res, next) => {
  * @apiName MarkAsRead
  * @apiGroup Messages
  * @description Marks all messages in a chat as read for the authenticated user.
- * 
- * @param {import('express').Request} req - Express request object.
- * @param {import('express').Response} res - Express response stream.
- * @param {import('express').NextFunction} next - Express next middleware function.
- * @returns {Promise<import('express').Response>}
  */
 const markAsRead = async (req, res, next) => {
   try {
@@ -144,11 +135,6 @@ const markAsRead = async (req, res, next) => {
  * @apiName GetUnreadCounts
  * @apiGroup Messages
  * @description Retrieves unread message counts for each chat the user is a part of.
- * 
- * @param {import('express').Request} req - Express request object.
- * @param {import('express').Response} res - Express response stream.
- * @param {import('express').NextFunction} next - Express next middleware function.
- * @returns {Promise<import('express').Response>}
  */
 const getUnreadCounts = async (req, res, next) => {
   try {
@@ -178,11 +164,6 @@ const getUnreadCounts = async (req, res, next) => {
  * @apiName DeleteMessage
  * @apiGroup Messages
  * @description Deletes a message, either for the sender only or for all participants.
- * 
- * @param {import('express').Request} req - Express request object.
- * @param {import('express').Response} res - Express response stream.
- * @param {import('express').NextFunction} next - Express next middleware function.
- * @returns {Promise<import('express').Response>}
  */
 const deleteMessage = async (req, res, next) => {
   try {
@@ -244,11 +225,6 @@ const deleteMessage = async (req, res, next) => {
  * @apiName EditMessage
  * @apiGroup Messages
  * @description Edits a message content value within a restricted 15-minute timeframe window.
- * 
- * @param {import('express').Request} req - Express request object.
- * @param {import('express').Response} res - Express response stream.
- * @param {import('express').NextFunction} next - Express next middleware function.
- * @returns {Promise<import('express').Response>}
  */
 const editMessage = async (req, res, next) => {
   try {

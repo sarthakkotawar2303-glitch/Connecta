@@ -7,10 +7,6 @@ const mongoose = require("mongoose");
  * @apiName AccessChat
  * @apiGroup Chat
  * @description Creates a new chat between two users if it doesn't exist, otherwise returns the existing chat.
- * @param {import('express').Request} req - Express request object.
- * @param {import('express').Response} res - Express response object.
- * @param {import('express').NextFunction} next - Express next middleware function.
- * @returns {Promise<import('express').Response>}
  */
 const accessChats = async (req, res, next) => {
   try {
@@ -70,10 +66,6 @@ const accessChats = async (req, res, next) => {
  * @apiName FetchChats
  * @apiGroup Chat
  * @description Fetches all chats for the logged-in user.
- * @param {import('express').Request} req - Express request object.
- * @param {import('express').Response} res - Express response object.
- * @param {import('express').NextFunction} next - Express next middleware function.
- * @returns {Promise<import('express').Response>}
  */
 const fetchChats = async (req, res, next) => {
   try {
@@ -103,11 +95,6 @@ const fetchChats = async (req, res, next) => {
  * @api {post} /api/chat/group Create Group Chat
  * @apiName CreateGroupChat
  * @apiGroup Chat
- * @description Creates a new group chat with the specified users.
- * @param {import('express').Request} req - Express request object.
- * @param {import('express').Response} res - Express response object.
- * @param {import('express').NextFunction} next - Express next middleware function.
- * @returns {Promise<import('express').Response>}
  */
 const createGroupChat = async (req, res, next) => {
   try {
@@ -170,10 +157,6 @@ const createGroupChat = async (req, res, next) => {
  * @apiName RenameGroup
  * @apiGroup Chat
  * @description Renames a group chat. Only the admin can perform this action.
- * @param {import('express').Request} req - Express request object.
- * @param {import('express').Response} res - Express response object.
- * @param {import('express').NextFunction} next - Express next middleware function.
- * @returns {Promise<import('express').Response>}
  */
 const renameGroup = async (req, res, next) => {
   try {
@@ -224,10 +207,6 @@ const renameGroup = async (req, res, next) => {
  * @apiName RemoveFromGroup
  * @apiGroup Chat
  * @description Removes a user from a group chat. Only the admin can perform this action.
- * @param {import('express').Request} req - Express request object.
- * @param {import('express').Response} res - Express response object.
- * @param {import('express').NextFunction} next - Express next middleware function.
- * @returns {Promise<import('express').Response>}
  */
 const removeFromGroup = async (req, res, next) => {
   try {
