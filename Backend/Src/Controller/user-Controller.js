@@ -2,10 +2,7 @@ const User = require("../Model/userModel");
 const { generateAccessToken, generateRefreshToken } = require("../service/authTokens");
 const uploadToCloudinary = require("../service/cloudinary");
 
-
-
 /**
- * 
  * @api {post} /api/user/signup Create User Account
  * @apiName SignUp
  * @apiGroup Authentication
@@ -21,19 +18,19 @@ const uploadToCloudinary = require("../service/cloudinary");
  * @param {Object} [req.file] - Optional profile picture uploaded via Multer.
  * @param {string} req.file.path - Local path of the uploaded profile picture.
  * @param {Object} res - Express response object.
+ * @param {import('express').NextFunction} next - Express next middleware function.
  * @returns {Promise<Object>} Express response JSON object containing user details and access token on success, or an error message.
  */
-const signUp = async (req, res) => {
+const signUp = async (req, res, next) => {
   try {
     let { username, email, password } = req.body;
 
     if (!username || !email || !password) {
       return res.status(400).json({
-        success:false,
+        success: false,
         message: "Please enter all required fields",
       });
     }
-
 
     username = username.trim();
     email = email.trim().toLowerCase();
@@ -41,13 +38,12 @@ const signUp = async (req, res) => {
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(409).json({
-        success:false,
+        success: false,
         message: "User already exists",
       });
     }
 
-    let imageUrl =
-      "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg";
+    let imageUrl = "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg";
 
     if (req.file) {
       try {
@@ -65,15 +61,12 @@ const signUp = async (req, res) => {
       pic: imageUrl,
     });
 
-    // Generate tokens
     const accessToken = generateAccessToken(newUser._id);
     const refreshToken = generateRefreshToken(newUser._id);
 
-    
     newUser.refreshToken = refreshToken;
     await newUser.save();
 
-    // Send refresh token as httpOnly cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -82,18 +75,17 @@ const signUp = async (req, res) => {
     });
 
     return res.status(201).json({
-      _id: newUser._id,
-      username: newUser.username,
-      email: newUser.email,
-      pic: newUser.pic,
-      accessToken,
+      success: true,
+      data: {
+        _id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+        pic: newUser.pic,
+        accessToken,
+      },
     });
-
   } catch (error) {
-    console.error("Signup error:", error);
-    return res.status(500).json({
-      message: "Something went wrong",
-    });
+    return next(error);
   }
 };
 
@@ -104,14 +96,16 @@ const signUp = async (req, res) => {
  * @description Validates user email and password fields, creates fresh authorization token pairs, updates state vectors via isolated updates, and sets persistent response cookies.
  * @param {import('express').Request} req - Express request object.
  * @param {import('express').Response} res - Express response object.
+ * @param {import('express').NextFunction} next - Express next middleware function.
  * @returns {Promise<import('express').Response>}
  */
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
   try {
     let { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
+        success: false,
         message: "Please enter email and password",
       });
     }
@@ -122,6 +116,7 @@ const loginUser = async (req, res) => {
 
     if (!user || !(await user.matchPassword(password))) {
       return res.status(401).json({
+        success: false,
         message: "Invalid email or password",
       });
     }
@@ -140,18 +135,17 @@ const loginUser = async (req, res) => {
     });
 
     return res.status(200).json({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      pic: user.pic,
-      accessToken,
+      success: true,
+      data: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        pic: user.pic,
+        accessToken,
+      },
     });
-
   } catch (error) {
-    console.error("Login error:", error);
-    return res.status(500).json({
-      message: "Something went wrong",
-    });
+    return next(error);
   }
 };
 
@@ -162,9 +156,10 @@ const loginUser = async (req, res) => {
  * @description Queries the user collection to search for active application accounts using a partial, case-insensitive string match on username or email fields. Automatically filters out the requesting user's profile from the results and strips sensitive tokens.
  * @param {import('express').Request} req - Express request object.
  * @param {import('express').Response} res - Express response object.
+ * @param {import('express').NextFunction} next - Express next middleware function.
  * @returns {Promise<import('express').Response>}
  */
-const allUsers = async (req, res) => {
+const allUsers = async (req, res, next) => {
   try {
     const search = req.query.search;
 
@@ -182,13 +177,12 @@ const allUsers = async (req, res) => {
       _id: { $ne: req.user._id },
     }).select("-password -refreshToken");
 
-    return res.status(200).json(users);
-
-  } catch (error) {
-    console.error("User search error:", error);
-    return res.status(500).json({
-      message: "Something went wrong",
+    return res.status(200).json({
+      success: true,
+      data: users,
     });
+  } catch (error) {
+    return next(error);
   }
 };
 
@@ -199,17 +193,15 @@ const allUsers = async (req, res) => {
  * @description Inactivates user sessions by extracting the refresh token from client cookies, purging the active token from the respective database record, and clearing the HttpOnly cookie.
  * @param {import('express').Request} req - Express request object.
  * @param {import('express').Response} res - Express response object.
+ * @param {import('express').NextFunction} next - Express next middleware function.
  * @returns {Promise<import('express').Response>}
  */
-const logoutUser = async (req, res) => {
+const logoutUser = async (req, res, next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
 
     if (refreshToken) {
-      await User.findOneAndUpdate(
-        { refreshToken },
-        { refreshToken: null }
-      );
+      await User.findOneAndUpdate({ refreshToken }, { refreshToken: null });
     }
 
     res.clearCookie("refreshToken", {
@@ -219,17 +211,13 @@ const logoutUser = async (req, res) => {
     });
 
     return res.status(200).json({
+      success: true,
       message: "Logged out successfully",
     });
-
   } catch (error) {
-    console.error("Logout error:", error);
-    return res.status(500).json({
-      message: "Logout failed",
-    });
+    return next(error);
   }
 };
-
 
 module.exports = {
   signUp,

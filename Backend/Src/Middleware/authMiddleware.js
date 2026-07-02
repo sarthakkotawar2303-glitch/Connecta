@@ -24,9 +24,7 @@ const auth = async (req, res, next) => {
     }
 
     const token = authHeader.split(" ")[1];
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
     const user = await User.findById(decoded.id).select("-password -refreshToken");
 
     if (!user) {
@@ -37,12 +35,8 @@ const auth = async (req, res, next) => {
     }
 
     req.user = user;
-
     return next();
-
   } catch (error) {
-    console.error("Authentication middleware gate catch:", error);
-
     if (error.name === "TokenExpiredError") {
       return res.status(401).json({
         success: false,

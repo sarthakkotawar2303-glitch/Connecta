@@ -7,7 +7,7 @@
  * @requires models/User
  */
 
-const Chat = require("../Model/chatModel"); // FIX 1: Harmonised signature to match function implementations
+const Chat = require("../Model/chatModel");
 const Message = require("../Model/msgModel");
 const User = require("../Model/userModel");
 
@@ -19,9 +19,10 @@ const User = require("../Model/userModel");
  * 
  * @param {import('express').Request} req - Express request object.
  * @param {import('express').Response} res - Express response stream.
+ * @param {import('express').NextFunction} next - Express next middleware function.
  * @returns {Promise<import('express').Response>}
  */
-const allMessages = async (req, res) => {
+const allMessages = async (req, res, next) => {
   try {
     const { chatId } = req.params;
 
@@ -38,22 +39,17 @@ const allMessages = async (req, res) => {
         path: "chat",
         populate: {
           path: "users",
-          select: "username pic email"
-        }
+          select: "username pic email",
+        },
       })
-      .sort({ createdAt: 1 }); 
+      .sort({ createdAt: 1 });
 
     return res.status(200).json({
       success: true,
-      data: messages
+      data: messages,
     });
-
   } catch (error) {
-    console.error("Fetch all messages error:", error);
-    return res.status(500).json({ 
-      success: false, 
-      message: "Internal server error" 
-    });
+    return next(error);
   }
 };
 
@@ -64,16 +60,17 @@ const allMessages = async (req, res) => {
  * @description Sends a new message to a chat, updating the chat's latest message reference index.
  * @param {import('express').Request} req - Express request object.
  * @param {import('express').Response} res - Express response stream.
+ * @param {import('express').NextFunction} next - Express next middleware function.
  * @returns {Promise<import('express').Response>}
  */
-const sendMessage = async (req, res) => {
+const sendMessage = async (req, res, next) => {
   try {
     const { content, chatId } = req.body;
 
     if (!content || !chatId) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: "Invalid request data. content and chatId are required." 
+        message: "Invalid request data. content and chatId are required.",
       });
     }
 
@@ -81,7 +78,7 @@ const sendMessage = async (req, res) => {
       sender: req.user._id,
       content: content.trim(),
       chat: chatId,
-      readBy: [req.user._id], 
+      readBy: [req.user._id],
     });
 
     message = await Message.findById(message._id)
@@ -92,23 +89,17 @@ const sendMessage = async (req, res) => {
       path: "chat.users",
       select: "username pic email",
     });
-   
-    await Chat.findByIdAndUpdate(
-      chatId, 
-      { $set: { latestMessage: message._id } } 
-    );
+
+    await Chat.findByIdAndUpdate(chatId, {
+      $set: { latestMessage: message._id },
+    });
 
     return res.status(200).json({
       success: true,
-      data: message
+      data: message,
     });
-
   } catch (error) {
-    console.error("Send message operational crash:", error);
-    return res.status(500).json({ 
-      success: false, 
-      message: "Internal server error" 
-    });
+    return next(error);
   }
 };
 
@@ -120,16 +111,17 @@ const sendMessage = async (req, res) => {
  * 
  * @param {import('express').Request} req - Express request object.
  * @param {import('express').Response} res - Express response stream.
+ * @param {import('express').NextFunction} next - Express next middleware function.
  * @returns {Promise<import('express').Response>}
  */
-const markAsRead = async (req, res) => {
+const markAsRead = async (req, res, next) => {
   try {
     const { chatId } = req.params;
 
     if (!chatId) {
       return res.status(400).json({
         success: false,
-        message: "chatId parameter is required"
+        message: "chatId parameter is required",
       });
     }
 
@@ -138,17 +130,12 @@ const markAsRead = async (req, res) => {
       { $addToSet: { readBy: req.user._id } }
     );
 
-    return res.status(200).json({ 
+    return res.status(200).json({
       success: true,
-      message: "Messages marked as read" 
+      message: "Messages marked as read",
     });
-
   } catch (error) {
-    console.error("Mark as read error:", error);
-    return res.status(500).json({ 
-      success: false,
-      message: "Internal server error" 
-    });
+    return next(error);
   }
 };
 
@@ -160,9 +147,10 @@ const markAsRead = async (req, res) => {
  * 
  * @param {import('express').Request} req - Express request object.
  * @param {import('express').Response} res - Express response stream.
+ * @param {import('express').NextFunction} next - Express next middleware function.
  * @returns {Promise<import('express').Response>}
  */
-const getUnreadCounts = async (req, res) => {
+const getUnreadCounts = async (req, res, next) => {
   try {
     const unreadCounts = await Message.aggregate([
       { $match: { readBy: { $nin: [req.user._id] } } },
@@ -178,15 +166,10 @@ const getUnreadCounts = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      data: countsMap
+      data: countsMap,
     });
-
   } catch (error) {
-    console.error("Get unread counts error:", error);
-    return res.status(500).json({ 
-      success: false,
-      message: "Internal server error" 
-    });
+    return next(error);
   }
 };
 
@@ -198,49 +181,48 @@ const getUnreadCounts = async (req, res) => {
  * 
  * @param {import('express').Request} req - Express request object.
  * @param {import('express').Response} res - Express response stream.
+ * @param {import('express').NextFunction} next - Express next middleware function.
  * @returns {Promise<import('express').Response>}
  */
-const deleteMessage = async (req, res) => {
+const deleteMessage = async (req, res, next) => {
   try {
     const { messageId } = req.params;
-    const { deleteForEveryone } = req.body; 
+    const { deleteForEveryone } = req.body;
 
-    const message = await Message.findById(messageId); 
+    const message = await Message.findById(messageId);
 
     if (!message) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: "Message not found" 
+        message: "Message not found",
       });
     }
 
     if (deleteForEveryone && message.sender.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         success: false,
-        message: "Not Authorized to delete this message for everyone" 
+        message: "Not Authorized to delete this message for everyone",
       });
     }
 
     let updatedMessage;
 
     if (deleteForEveryone) {
-      // Optimization: Using atomic updates instead of save execution loops
       updatedMessage = await Message.findByIdAndUpdate(
         messageId,
-        { 
-          $set: { 
+        {
+          $set: {
             isDeleted: true,
-            content: "This message was deleted" 
-          } 
+            content: "This message was deleted",
+          },
         },
         { new: true }
       )
         .populate("sender", "username pic email")
         .populate("chat");
     } else {
-      // FIX 3: Realigned model token path from deletedFor back to your schema variable key 'deleteFor'
       updatedMessage = await Message.findByIdAndUpdate(
-        messageId, 
+        messageId,
         { $addToSet: { deleteFor: req.user._id } },
         { new: true }
       )
@@ -250,15 +232,10 @@ const deleteMessage = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      data: updatedMessage
+      data: updatedMessage,
     });
-
   } catch (error) {
-    console.error("Delete message error:", error);
-    return res.status(500).json({ 
-      success: false,
-      message: "Internal server error" 
-    });
+    return next(error);
   }
 };
 
@@ -270,9 +247,10 @@ const deleteMessage = async (req, res) => {
  * 
  * @param {import('express').Request} req - Express request object.
  * @param {import('express').Response} res - Express response stream.
+ * @param {import('express').NextFunction} next - Express next middleware function.
  * @returns {Promise<import('express').Response>}
  */
-const editMessage = async (req, res) => {
+const editMessage = async (req, res, next) => {
   try {
     const { messageId } = req.params;
     const { content } = req.body;
@@ -280,43 +258,41 @@ const editMessage = async (req, res) => {
     if (!content || !content.trim()) {
       return res.status(400).json({
         success: false,
-        message: "Updated content cannot be empty"
+        message: "Updated content cannot be empty",
       });
     }
 
     const message = await Message.findById(messageId);
 
     if (!message) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: "Message not found" 
+        message: "Message not found",
       });
     }
 
     if (message.sender.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         success: false,
-        message: "Not Authorized to edit this message" 
+        message: "Not Authorized to edit this message",
       });
     }
 
-    // Optimization: Standardised calculation parsing logic hooks
     const timeDifferenceInMinutes = (Date.now() - new Date(message.createdAt).getTime()) / 1000 / 60;
     if (timeDifferenceInMinutes > 15) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: "Cannot edit message after 15 minutes" 
+        message: "Cannot edit message after 15 minutes",
       });
     }
 
-    // Optimization: Unified modification pipeline step skipping side-effects
     const updated = await Message.findByIdAndUpdate(
       messageId,
-      { 
-        $set: { 
-          content: content.trim(), 
-          isEdited: true 
-        } 
+      {
+        $set: {
+          content: content.trim(),
+          isEdited: true,
+        },
       },
       { new: true }
     )
@@ -325,15 +301,10 @@ const editMessage = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      data: updated
+      data: updated,
     });
-
   } catch (error) {
-    console.error("Edit message error:", error);
-    return res.status(500).json({ 
-      success: false,
-      message: "Internal server error" 
-    });
+    return next(error);
   }
 };
 
@@ -342,6 +313,6 @@ module.exports = {
   sendMessage,
   markAsRead,
   getUnreadCounts,
-  deleteMessage, 
-  editMessage,   
+  deleteMessage,
+  editMessage,
 };

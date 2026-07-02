@@ -9,7 +9,7 @@ import { getInitials, getAvatarBgColor } from "../../utils/sidebarHelpers";
 const GroupInfoPanel = ({ onClose }) => {
   const { user } = useAuthContext();
   const { selectedChat, onlineUsers } = useChatContext();
-  const { renameGroupChat, addToGroup, removeFromGroup, searchUsers, deleteMessage } = useChatActions();
+  const { renameGroupChat, addToGroup, removeFromGroup, searchUsers } = useChatActions();
 
   const [newName, setNewName] = useState(selectedChat?.chatName || "");
   const [memberSearch, setMemberSearch] = useState("");

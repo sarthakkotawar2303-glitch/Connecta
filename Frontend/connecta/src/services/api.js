@@ -16,7 +16,7 @@ api.interceptors.request.use((config) => {
 // Response interceptor to unwrap `{ success: true, data: ... }` envelope
 api.interceptors.response.use(
   (response) => {
-    if (response.data && response.data.success === true && response.data.hasOwnProperty("data")) {
+    if (response.data && response.data.success === true && Object.prototype.hasOwnProperty.call(response.data, "data")) {
       response.data = response.data.data;
     }
     return response;

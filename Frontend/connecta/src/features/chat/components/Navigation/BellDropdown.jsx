@@ -1,4 +1,4 @@
-import { Bell, Users, MessageSquare } from "lucide-react";
+import { Bell, Users } from "lucide-react";
 import { getChatName, getChatPic, getMessagePreview, FALLBACK_AVATAR } from "../../utils/navbarHelpers";
 
 const BellDropdown = ({

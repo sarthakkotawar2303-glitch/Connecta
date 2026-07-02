@@ -51,6 +51,7 @@ const ChatArea = () => {
   // Handle room joining and leaving
   useEffect(() => {
     if (!selectedChat?._id) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setNewMessage("");
       setShowEmoji(false);
       setEditingMessage(null);

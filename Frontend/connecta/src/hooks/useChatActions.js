@@ -7,12 +7,12 @@ import { useAuthContext } from "../context/AuthContext";
 export const useChatActions = () => {
   const { user, logoutUser } = useAuthContext();
   const {
-    chats, setChats,
-    loadingChats, setLoadingChats,
+    setChats,
+    setLoadingChats,
     selectedChat, setSelectedChat,
-    messages, setMessages,
-    loadingMessages, setLoadingMessages,
-    unreadCounts, setUnreadCounts,
+    setMessages,
+    setLoadingMessages,
+    setUnreadCounts,
     setOnlineUsers,
   } = useChatContext();
 

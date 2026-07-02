@@ -2,7 +2,6 @@ import EmojiPicker from "emoji-picker-react";
 import { Smile, Send, X, Check } from "lucide-react";
 
 const MessageInput = ({
-  chatName,
   newMessage,
   sending,
   showEmoji,

@@ -1,4 +1,3 @@
-import { Users } from "lucide-react";
 import ReadReceipt from "./ReadReceipt";
 import { getChatName, getChatPic, getOtherUser, getLatestMsg, formatTime, getInitials, getAvatarBgColor } from "../../utils/sidebarHelpers";
 

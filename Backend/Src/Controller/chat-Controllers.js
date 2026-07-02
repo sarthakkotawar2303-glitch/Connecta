@@ -2,7 +2,6 @@ const Chat = require("../Model/chatModel");
 const User = require("../Model/userModel");
 const mongoose = require("mongoose");
 
-
 /**
  * @api {post} /api/chat/access Create Chat
  * @apiName AccessChat
@@ -10,16 +9,17 @@ const mongoose = require("mongoose");
  * @description Creates a new chat between two users if it doesn't exist, otherwise returns the existing chat.
  * @param {import('express').Request} req - Express request object.
  * @param {import('express').Response} res - Express response object.
+ * @param {import('express').NextFunction} next - Express next middleware function.
  * @returns {Promise<import('express').Response>}
  */
-const accessChats = async (req, res) => {
+const accessChats = async (req, res, next) => {
   try {
     const { userId } = req.body;
 
     if (!userId) {
       return res.status(400).json({
         success: false,
-        message: "userId not sent in request"
+        message: "userId not sent in request",
       });
     }
 
@@ -33,7 +33,6 @@ const accessChats = async (req, res) => {
       .populate("users", "-password -refreshToken")
       .populate("latestMessage");
 
-
     isChat = await User.populate(isChat, {
       path: "latestMessage.sender",
       select: "username pic email",
@@ -42,7 +41,7 @@ const accessChats = async (req, res) => {
     if (isChat.length > 0) {
       return res.status(200).json({
         success: true,
-        data: isChat[0]
+        data: isChat[0],
       });
     }
 
@@ -59,18 +58,12 @@ const accessChats = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      data: fullChat
+      data: fullChat,
     });
-
   } catch (error) {
-    console.error("Access chat error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error"
-    });
+    return next(error);
   }
 };
-
 
 /**
  * @api {get} /api/chat/all Fetch Chats
@@ -79,12 +72,13 @@ const accessChats = async (req, res) => {
  * @description Fetches all chats for the logged-in user.
  * @param {import('express').Request} req - Express request object.
  * @param {import('express').Response} res - Express response object.
+ * @param {import('express').NextFunction} next - Express next middleware function.
  * @returns {Promise<import('express').Response>}
  */
-const fetchChats = async (req, res) => {
+const fetchChats = async (req, res, next) => {
   try {
     let chats = await Chat.find({
-      users: { $elemMatch: { $eq: req.user._id } }
+      users: { $elemMatch: { $eq: req.user._id } },
     })
       .populate("users", "-password -refreshToken")
       .populate("groupAdmin", "-password -refreshToken")
@@ -98,18 +92,12 @@ const fetchChats = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      data: chats
+      data: chats,
     });
-
   } catch (error) {
-    console.error("Fetch chats error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error"
-    });
+    return next(error);
   }
 };
-
 
 /**
  * @api {post} /api/chat/group Create Group Chat
@@ -118,23 +106,24 @@ const fetchChats = async (req, res) => {
  * @description Creates a new group chat with the specified users.
  * @param {import('express').Request} req - Express request object.
  * @param {import('express').Response} res - Express response object.
+ * @param {import('express').NextFunction} next - Express next middleware function.
  * @returns {Promise<import('express').Response>}
  */
-const createGroupChat = async (req, res) => {
+const createGroupChat = async (req, res, next) => {
   try {
     const { users, chatName } = req.body;
 
     if (!users || !chatName) {
       return res.status(400).json({
         success: false,
-        message: "Please fill all fields"
+        message: "Please fill all fields",
       });
     }
 
     if (!Array.isArray(users)) {
       return res.status(400).json({
         success: false,
-        message: "Users must be an array"
+        message: "Users must be an array",
       });
     }
 
@@ -145,14 +134,12 @@ const createGroupChat = async (req, res) => {
       });
     }
 
-    const validUsers = users.filter((id) =>
-      mongoose.Types.ObjectId.isValid(id)
-    );
+    const validUsers = users.filter((id) => mongoose.Types.ObjectId.isValid(id));
 
     if (validUsers.length !== users.length) {
       return res.status(400).json({
         success: false,
-        message: "Invalid user ID detected"
+        message: "Invalid user ID detected",
       });
     }
 
@@ -171,18 +158,12 @@ const createGroupChat = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      data: fullGroupChat
+      data: fullGroupChat,
     });
-
   } catch (error) {
-    console.error("Create Group Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error"
-    });
+    return next(error);
   }
 };
-
 
 /**
  * @api {put} /api/chat/rename Rename Group
@@ -191,9 +172,10 @@ const createGroupChat = async (req, res) => {
  * @description Renames a group chat. Only the admin can perform this action.
  * @param {import('express').Request} req - Express request object.
  * @param {import('express').Response} res - Express response object.
+ * @param {import('express').NextFunction} next - Express next middleware function.
  * @returns {Promise<import('express').Response>}
  */
-const renameGroup = async (req, res) => {
+const renameGroup = async (req, res, next) => {
   try {
     const { chatId, chatName } = req.body;
 
@@ -209,14 +191,14 @@ const renameGroup = async (req, res) => {
     if (!chat) {
       return res.status(404).json({
         success: false,
-        message: "Chat not found"
+        message: "Chat not found",
       });
     }
 
     if (chat.groupAdmin.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
-        message: "Only admin can perform this action"
+        message: "Only admin can perform this action",
       });
     }
 
@@ -230,18 +212,12 @@ const renameGroup = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      data: updatedChat
+      data: updatedChat,
     });
-
   } catch (error) {
-    console.error("Rename group error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error"
-    });
+    return next(error);
   }
 };
-
 
 /**
  * @api {put} /api/chat/remove Remove from Group
@@ -250,9 +226,10 @@ const renameGroup = async (req, res) => {
  * @description Removes a user from a group chat. Only the admin can perform this action.
  * @param {import('express').Request} req - Express request object.
  * @param {import('express').Response} res - Express response object.
+ * @param {import('express').NextFunction} next - Express next middleware function.
  * @returns {Promise<import('express').Response>}
  */
-const removeFromGroup = async (req, res) => {
+const removeFromGroup = async (req, res, next) => {
   try {
     const { chatId, userId } = req.body;
 
@@ -268,14 +245,14 @@ const removeFromGroup = async (req, res) => {
     if (!chat) {
       return res.status(404).json({
         success: false,
-        message: "Chat not found"
+        message: "Chat not found",
       });
     }
 
     if (chat.groupAdmin.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
-        message: "Only admin can perform this action"
+        message: "Only admin can perform this action",
       });
     }
 
@@ -289,20 +266,12 @@ const removeFromGroup = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      data: updatedChat
+      data: updatedChat,
     });
-
   } catch (error) {
-    console.error("Remove from group error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error"
-    });
+    return next(error);
   }
 };
-
-
-
 
 /**
  * @api {put} /api/chat/add Add to Group
@@ -311,9 +280,10 @@ const removeFromGroup = async (req, res) => {
  * @description Adds a user to a group chat. Only the admin can perform this action.
  * @param {import('express').Request} req - Express request object.
  * @param {import('express').Response} res - Express response object.
+ * @param {import('express').NextFunction} next - Express next middleware function.
  * @returns {Promise<import('express').Response>}
  */
-const addToGroup = async (req, res) => {
+const addToGroup = async (req, res, next) => {
   try {
     const { chatId, userId } = req.body;
 
@@ -329,14 +299,14 @@ const addToGroup = async (req, res) => {
     if (!chat) {
       return res.status(404).json({
         success: false,
-        message: "Chat not found"
+        message: "Chat not found",
       });
     }
 
     if (chat.groupAdmin.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
-        message: "Only admin can perform this action"
+        message: "Only admin can perform this action",
       });
     }
 
@@ -350,15 +320,10 @@ const addToGroup = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      data: added
+      data: added,
     });
-
   } catch (error) {
-    console.error("Add to group error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error"
-    });
+    return next(error);
   }
 };
 
