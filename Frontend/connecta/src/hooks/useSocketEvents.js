@@ -29,7 +29,7 @@ export const useSocketEvents = () => {
 
     socketService.connect(SOCKET_URL, user._id);
 
-    const handleConnected = () => console.log("Socket ready");
+    const handleConnected = () => {};
 
     const handleMessageReceived = (newMessage) => {
       const currentChat = selectedChatRef.current;
