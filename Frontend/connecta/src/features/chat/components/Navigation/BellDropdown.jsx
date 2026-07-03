@@ -23,9 +23,9 @@ const BellDropdown = ({
         title="Notifications"
       >
         <Bell className="w-4.5 h-4.5" />
-        {totalUnread > 0 && (
+        {unreadChats.length > 0 && (
           <span className="absolute top-1.5 right-1.5 bg-sky-600 text-white text-[9px] font-bold min-w-[15px] h-[15px] px-1 rounded-full flex items-center justify-center leading-none animate-pulse">
-            {totalUnread > 99 ? "99+" : totalUnread}
+            {unreadChats.length > 99 ? "99+" : unreadChats.length}
           </span>
         )}
       </button>
@@ -34,9 +34,9 @@ const BellDropdown = ({
         <div className="absolute left-14 bottom-0 w-80 bg-slate-900/95 backdrop-blur-xl border border-[#1e293b]/80 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-left-3 duration-150">
           <div className="px-4 py-3 border-b border-slate-800/80 flex items-center justify-between">
             <p className="text-white font-semibold text-xs uppercase tracking-wider">Notifications</p>
-            {totalUnread > 0 && (
+            {unreadChats.length > 0 && (
               <span className="bg-sky-500/10 text-sky-400 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                {totalUnread} unread
+                {unreadChats.length} unread
               </span>
             )}
           </div>

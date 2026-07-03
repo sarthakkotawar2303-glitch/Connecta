@@ -31,7 +31,7 @@ const signUp = async (req, res, next) => {
       });
     }
 
-    let imageUrl = "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg";
+    let imageUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=random&color=fff&size=200`;
 
     if (req.file) {
       try {
