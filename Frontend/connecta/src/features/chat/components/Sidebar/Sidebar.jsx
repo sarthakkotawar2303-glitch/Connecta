@@ -16,7 +16,7 @@ const Sidebar = () => {
   } = useSidebar();
 
   return (
-    <div className="w-80 bg-[#1E293B] rounded-2xl flex flex-col h-full flex-shrink-0 overflow-hidden shadow-xl border border-[#334155]/25">
+    <div className="w-full md:w-80 bg-[#1E293B] rounded-none md:rounded-2xl flex flex-col h-full flex-shrink-0 overflow-hidden shadow-xl border border-[#334155]/25">
       <div className="px-5 pt-5 pb-4 border-b border-[#334155]/30">
         <div className="flex items-center justify-between mb-3.5">
           <h2 className="text-white font-headline-md text-base font-bold tracking-wide">Recent Conversations</h2>

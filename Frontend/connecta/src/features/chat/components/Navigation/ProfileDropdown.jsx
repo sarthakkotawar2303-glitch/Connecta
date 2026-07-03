@@ -31,7 +31,7 @@ const ProfileDropdown = ({ dropdownRef, profileOpen, setProfileOpen, user, onLog
       </button>
 
       {profileOpen && (
-        <div className="absolute left-14 bottom-0 w-48 bg-slate-900/95 backdrop-blur-xl border border-[#1e293b]/80 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-left-3 duration-150">
+        <div className="fixed md:absolute bottom-20 md:bottom-0 right-4 md:left-14 md:right-auto md:w-48 w-48 bg-slate-900/95 backdrop-blur-xl border border-[#1e293b]/80 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-2 md:slide-in-from-left-3 duration-150">
           <div className="px-4 py-3.5 border-b border-slate-800/80">
             <p className="text-white font-semibold text-xs truncate">{user?.username}</p>
             <p className="text-slate-500 text-[10px] truncate mt-0.5">{user?.email}</p>

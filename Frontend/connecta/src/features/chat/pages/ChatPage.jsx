@@ -5,9 +5,11 @@ import ChatArea from "../components/ChatArea/ChatArea";
 import { useSocketEvents } from "../../../hooks/useSocketEvents";
 import { useChatActions } from "../../../hooks/useChatActions";
 import { useAuthContext } from "../../../context/AuthContext";
+import { useChatContext } from "../../../context/ChatContext";
 
 const ChatPage = () => {
   const { user } = useAuthContext();
+  const { selectedChat } = useChatContext();
   const { fetchChats, fetchUnreadCounts } = useChatActions();
 
   // Run the Socket connection lifecycle & listeners binding
@@ -22,11 +24,16 @@ const ChatPage = () => {
   }, [user, fetchChats, fetchUnreadCounts]);
 
   return (
-    <div className="h-screen w-full flex bg-[#121212] overflow-hidden">
+    <div className="h-screen w-full flex flex-col md:flex-row bg-[#121212] overflow-hidden pb-16 md:pb-0">
       <MenuSidebar />
-      <div className="flex-1 flex gap-4 p-4 pl-0 h-full overflow-hidden">
-        <Sidebar />
-        <ChatArea />
+      <div className="flex-1 flex flex-col md:flex-row md:gap-4 md:p-4 md:pl-0 h-full overflow-hidden relative">
+        <div className={`w-full h-full md:w-80 md:flex-shrink-0 ${selectedChat ? 'hidden md:flex' : 'flex'}`}>
+          <Sidebar />
+        </div>
+        
+        <div className={`w-full h-full flex-1 ${!selectedChat ? 'hidden md:flex' : 'flex'}`}>
+          <ChatArea />
+        </div>
       </div>
     </div>
   );

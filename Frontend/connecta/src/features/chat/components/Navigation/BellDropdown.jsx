@@ -31,7 +31,7 @@ const BellDropdown = ({
       </button>
 
       {bellOpen && (
-        <div className="absolute left-14 bottom-0 w-80 bg-slate-900/95 backdrop-blur-xl border border-[#1e293b]/80 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-left-3 duration-150">
+        <div className="fixed md:absolute bottom-20 md:bottom-0 left-4 right-4 md:left-14 md:right-auto md:w-80 w-auto bg-slate-900/95 backdrop-blur-xl border border-[#1e293b]/80 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-2 md:slide-in-from-left-3 duration-150">
           <div className="px-4 py-3 border-b border-slate-800/80 flex items-center justify-between">
             <p className="text-white font-semibold text-xs uppercase tracking-wider">Notifications</p>
             {unreadChats.length > 0 && (
