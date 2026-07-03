@@ -1,7 +1,9 @@
+import { useState } from "react";
 import ReadReceipt from "./ReadReceipt";
 import { getChatName, getChatPic, getOtherUser, getLatestMsg, formatTime, getInitials, getAvatarBgColor } from "../../utils/sidebarHelpers";
 
 const ChatRow = ({ chat, isSelected, currentUserId, unread, onlineUsers, onClick }) => {
+  const [imgError, setImgError] = useState(false);
   const pic = getChatPic(chat, currentUserId);
   const otherUser = getOtherUser(chat, currentUserId);
   const isOnline = !chat.isGroupChat && onlineUsers[otherUser?._id]?.isOnline;
@@ -11,6 +13,8 @@ const ChatRow = ({ chat, isSelected, currentUserId, unread, onlineUsers, onClick
   const chatName = getChatName(chat, currentUserId);
   const initials = getInitials(chatName);
   const avatarBg = getAvatarBgColor(chatName);
+  
+  const showInitials = !pic || pic.includes("anonymous-avatar-icon") || imgError;
 
   return (
     <div
@@ -24,10 +28,11 @@ const ChatRow = ({ chat, isSelected, currentUserId, unread, onlineUsers, onClick
       }`}
     >
       <div className="relative flex shrink-0">
-        {pic ? (
+        {!showInitials ? (
           <img
             src={pic}
             alt=""
+            onError={() => setImgError(true)}
             className="w-10 h-10 rounded-full object-cover border border-[#334155]/40 shadow-sm"
           />
         ) : (
